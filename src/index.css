@@ -1,0 +1,210 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    border-color: hsl(var(--border));
+  }
+
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+:root {
+  --radius: 0.625rem;
+  --sidebar-width: 260px;
+  --header-height: 64px;
+  --background: 240 10% 3.9%;
+  --foreground: 0 0% 95%;
+  --card: 240 10% 5.9%;
+  --card-foreground: 0 0% 95%;
+  --popover: 240 10% 5.9%;
+  --popover-foreground: 0 0% 95%;
+  --primary: 0 72% 51%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 240 5% 14%;
+  --secondary-foreground: 0 0% 90%;
+  --muted: 240 5% 14%;
+  --muted-foreground: 240 5% 60%;
+  --accent: 240 5% 14%;
+  --accent-foreground: 0 0% 95%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 100%;
+  --success: 142 76% 36%;
+  --success-foreground: 0 0% 100%;
+  --warning: 38 92% 50%;
+  --warning-foreground: 48 96% 89%;
+  --border: 240 5% 16%;
+  --ring: 0 72% 51%;
+  --sidebar: 240 10% 3.9%;
+  --sidebar-foreground: 240 5% 70%;
+  --sidebar-active: 0 72% 51%;
+  --sidebar-active-foreground: 0 0% 100%;
+  --sidebar-hover: 240 5% 12%;
+  --shadow-glow: 0 0 30px hsla(0, 72%, 51%, 0.15);
+  color-scheme: dark;
+}
+
+.theme-dark-premium {
+  --background: 240 10% 3.9%;
+  --foreground: 0 0% 95%;
+  --card: 240 10% 5.9%;
+  --card-foreground: 0 0% 95%;
+  --popover: 240 10% 5.9%;
+  --popover-foreground: 0 0% 95%;
+  --primary: 0 72% 51%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 240 5% 14%;
+  --secondary-foreground: 0 0% 90%;
+  --muted: 240 5% 14%;
+  --muted-foreground: 240 5% 60%;
+  --accent: 240 5% 14%;
+  --accent-foreground: 0 0% 95%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 100%;
+  --success: 142 76% 36%;
+  --success-foreground: 0 0% 100%;
+  --warning: 38 92% 50%;
+  --warning-foreground: 48 96% 89%;
+  --border: 240 5% 16%;
+  --ring: 0 72% 51%;
+  --sidebar: 240 10% 3.9%;
+  --sidebar-foreground: 240 5% 70%;
+  --sidebar-active: 0 72% 51%;
+  --sidebar-active-foreground: 0 0% 100%;
+  --sidebar-hover: 240 5% 12%;
+  --shadow-glow: 0 0 30px hsla(0, 72%, 51%, 0.15);
+  color-scheme: dark;
+}
+
+.theme-light-clean {
+  --background: 0 0% 97%;
+  --foreground: 240 10% 3.9%;
+  --card: 0 0% 100%;
+  --card-foreground: 240 10% 3.9%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 240 10% 3.9%;
+  --primary: 0 72% 45%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 240 5% 94%;
+  --secondary-foreground: 240 6% 12%;
+  --muted: 240 5% 94%;
+  --muted-foreground: 240 5% 50%;
+  --accent: 240 5% 94%;
+  --accent-foreground: 240 6% 12%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 100%;
+  --success: 142 76% 36%;
+  --success-foreground: 0 0% 100%;
+  --warning: 38 92% 50%;
+  --warning-foreground: 48 96% 89%;
+  --border: 240 6% 90%;
+  --ring: 0 72% 45%;
+  --sidebar: 0 0% 100%;
+  --sidebar-foreground: 240 5% 45%;
+  --sidebar-active: 0 72% 45%;
+  --sidebar-active-foreground: 0 0% 100%;
+  --sidebar-hover: 240 5% 94%;
+  --shadow-glow: 0 4px 20px hsla(0, 0%, 0%, 0.06);
+  color-scheme: light;
+}
+
+.theme-blue-corporate {
+  --background: 210 40% 96%;
+  --foreground: 215 30% 12%;
+  --card: 0 0% 100%;
+  --card-foreground: 215 30% 12%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 215 30% 12%;
+  --primary: 215 70% 35%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 215 30% 92%;
+  --secondary-foreground: 215 50% 20%;
+  --muted: 215 30% 92%;
+  --muted-foreground: 215 20% 50%;
+  --accent: 215 30% 92%;
+  --accent-foreground: 215 50% 20%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 100%;
+  --success: 160 84% 30%;
+  --success-foreground: 0 0% 100%;
+  --warning: 38 92% 50%;
+  --warning-foreground: 48 96% 89%;
+  --border: 215 25% 85%;
+  --ring: 215 70% 35%;
+  --sidebar: 215 50% 20%;
+  --sidebar-foreground: 215 20% 75%;
+  --sidebar-active: 215 70% 50%;
+  --sidebar-active-foreground: 0 0% 100%;
+  --sidebar-hover: 215 40% 28%;
+  --shadow-glow: 0 4px 20px hsla(215, 70%, 35%, 0.10);
+  color-scheme: light;
+}
+
+.theme-logistics-red {
+  --background: 0 25% 6%;
+  --foreground: 0 0% 93%;
+  --card: 0 20% 9%;
+  --card-foreground: 0 0% 93%;
+  --popover: 0 20% 9%;
+  --popover-foreground: 0 0% 93%;
+  --primary: 0 85% 40%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 30 15% 14%;
+  --secondary-foreground: 30 10% 85%;
+  --muted: 0 15% 14%;
+  --muted-foreground: 0 0% 50%;
+  --accent: 0 18% 17%;
+  --accent-foreground: 0 0% 93%;
+  --destructive: 0 84% 55%;
+  --destructive-foreground: 0 0% 100%;
+  --success: 142 50% 38%;
+  --success-foreground: 0 0% 100%;
+  --warning: 38 92% 50%;
+  --warning-foreground: 48 96% 89%;
+  --border: 0 15% 17%;
+  --ring: 0 85% 40%;
+  --sidebar: 0 25% 5%;
+  --sidebar-foreground: 0 0% 55%;
+  --sidebar-active: 0 85% 40%;
+  --sidebar-active-foreground: 0 0% 100%;
+  --sidebar-hover: 0 18% 12%;
+  --shadow-glow: 0 0 35px hsla(0, 85%, 40%, 0.2);
+  color-scheme: dark;
+}
+
+.theme-glass-midnight {
+  --background: 222 47% 6%;
+  --foreground: 210 40% 92%;
+  --card: 222 47% 8%;
+  --card-foreground: 210 40% 92%;
+  --popover: 222 47% 8%;
+  --popover-foreground: 210 40% 92%;
+  --primary: 217 91% 55%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 215 25% 18%;
+  --secondary-foreground: 210 20% 85%;
+  --muted: 215 25% 18%;
+  --muted-foreground: 215 20% 55%;
+  --accent: 215 25% 18%;
+  --accent-foreground: 210 20% 85%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 100%;
+  --success: 142 76% 36%;
+  --success-foreground: 0 0% 100%;
+  --warning: 38 92% 50%;
+  --warning-foreground: 48 96% 89%;
+  --border: 215 25% 16%;
+  --ring: 217 91% 55%;
+  --sidebar: 222 47% 6%;
+  --sidebar-foreground: 215 20% 60%;
+  --sidebar-active: 217 91% 55%;
+  --sidebar-active-foreground: 0 0% 100%;
+  --sidebar-hover: 215 25% 14%;
+  --shadow-glow: 0 0 40px hsla(217, 91%, 55%, 0.08);
+  color-scheme: dark;
+}

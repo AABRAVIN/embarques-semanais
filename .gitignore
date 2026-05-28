@@ -1,0 +1,21 @@
+# Pastas de dependências e build
+node_modules/
+dist/
+dist-ssr/
+*.local
+
+# Variáveis de ambiente (Segurança!)
+.env
+.env.*
+!.env.example
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# IDEs e Sistema
+.DS_Store
+.vscode/
+.idea/
+*.tsbuildinfo
