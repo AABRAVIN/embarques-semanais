@@ -1,11 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Eye, EyeOff, LogIn, Truck, AlertCircle } from "lucide-react";
-import { useAuth } from "@/hooks/use-auth";
+import { supabase } from "@/lib/supabaseClient";
 
 export function Login() {
   const navigate = useNavigate();
-  const { signIn } = useAuth();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -24,8 +23,12 @@ export function Login() {
 
     setLoading(true);
     try {
-      await signIn(email, password);
-      navigate("/", { replace: true });
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      if (signInError) throw signInError;
+      navigate("/dashboard", { replace: true });
     } catch (err: unknown) {
       const msg =
         err instanceof Error ? err.message : "Erro ao fazer login.";
@@ -55,11 +58,11 @@ export function Login() {
           <div className="pointer-events-none absolute -inset-1 rounded-2xl bg-gradient-to-br from-primary/10 via-transparent to-transparent opacity-60" />
 
           {/* Logo */}
-          <div className="relative mb-6 flex flex-col items-center gap-3">
+          <div className="relative mb-6 flex flex-col items-center justify-center -mt-8">
             <img
               src="/images/logo.png"
               alt="Logo"
-              className="h-16 w-auto object-contain"
+              className="h-48 w-48 object-contain"
               onError={(e) => {
                 const t = e.currentTarget;
                 t.style.display = "none";
@@ -67,10 +70,10 @@ export function Login() {
                 if (fallback) (fallback as HTMLElement).style.display = "flex";
               }}
             />
-            <div className="hidden h-14 w-14 items-center justify-center rounded-xl bg-primary shadow-glow">
-              <Truck className="h-7 w-7 text-primary-foreground" />
+            <div className="hidden h-48 w-48 items-center justify-center rounded-xl bg-primary shadow-glow">
+              <Truck className="h-12 w-12 text-primary-foreground" />
             </div>
-            <h1 className="text-xl font-bold text-white">Embarques Semanais</h1>
+            <h1 className="mt-8 text-xl font-bold text-white">Embarques Semanais</h1>
             <p className="text-sm text-white/70">Faça login para continuar</p>
           </div>
 

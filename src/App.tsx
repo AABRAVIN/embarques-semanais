@@ -3,6 +3,7 @@ import { Sidebar } from "@/components/Sidebar";
 import { Header } from "@/components/Header";
 import { Dashboard } from "@/pages/Dashboard";
 import { Configuracoes } from "@/pages/Configuracoes";
+import { MotoristasVeiculos } from "@/pages/MotoristasVeiculos";
 import { Login } from "@/pages/Login";
 import { Navigate, Route, Routes } from "react-router-dom";
 
@@ -24,12 +25,13 @@ function ProtectedLayout() {
   return (
     <div className="flex h-screen overflow-hidden bg-background text-foreground">
       <Sidebar />
-      <div className="flex flex-1 flex-col">
+      <div className="flex min-w-0 flex-1 flex-col">
         <Header />
         <main className="flex-1 overflow-y-auto">
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/configuracoes" element={<Configuracoes />} />
+            <Route path="/motoristas-veiculos" element={<MotoristasVeiculos />} />
             <Route path="*" element={<Dashboard />} />
           </Routes>
         </main>

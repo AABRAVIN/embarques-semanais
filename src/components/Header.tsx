@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
-import { Search, User } from "lucide-react";
+import { User } from "lucide-react";
 import { ThemeToggle } from "./ThemeToggle";
 import { NotificationsPopover } from "./NotificationsPopover";
-import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/use-auth";
 
 export function Header() {
@@ -37,21 +36,8 @@ export function Header() {
         </span>
       </div>
 
-      {/* Centered Search */}
-      <div className="flex flex-1 justify-center px-8">
-        <div className="relative w-full max-w-md">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <input
-            type="text"
-            placeholder="Buscar embarques, motoristas, clientes..."
-            className={cn(
-              "h-9 w-full rounded-lg border border-border bg-background pl-9 pr-3 text-sm transition-all duration-200",
-              "placeholder:text-muted-foreground",
-              "focus:outline-none focus:ring-2 focus:ring-ring focus:shadow-glow"
-            )}
-          />
-        </div>
-      </div>
+      {/* Spacer to keep right side pushed right */}
+      <div className="flex-1" />
 
       {/* Right side */}
       <div className="flex items-center gap-3">

@@ -152,7 +152,7 @@ export function RightPanel() {
 
   return (
     <>
-      <div className="flex w-[280px] shrink-0 flex-col gap-4 overflow-y-auto border-l border-border bg-card p-4">
+      <div className="hidden xl:flex w-[280px] shrink-0 flex-col gap-4 overflow-y-auto border-l border-border bg-card p-4">
         {/* Agenda */}
         <section>
           <div className="mb-3 flex items-center gap-2">
@@ -163,7 +163,7 @@ export function RightPanel() {
             initial="hidden"
             animate="visible"
             variants={{ visible: { transition: { staggerChildren: 0.04 } } }}
-            className="flex flex-col gap-1.5"
+            className="flex flex-col gap-1.5 max-h-[250px] overflow-y-auto"
           >
             {agenda.length === 0 ? (
               <p className="py-4 text-center text-[10px] text-muted-foreground">Nenhum item na agenda</p>
@@ -215,7 +215,7 @@ export function RightPanel() {
             initial="hidden"
             animate="visible"
             variants={{ visible: { transition: { staggerChildren: 0.04 } } }}
-            className="flex flex-col gap-1.5"
+            className="flex flex-col gap-1.5 max-h-[210px] overflow-y-auto"
           >
             {ocorrencias.length === 0 ? (
               <p className="py-4 text-center text-[10px] text-muted-foreground">Nenhuma ocorrência</p>

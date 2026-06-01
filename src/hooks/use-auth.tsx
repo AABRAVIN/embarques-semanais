@@ -6,7 +6,7 @@ import {
   useCallback,
   type ReactNode,
 } from "react";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/lib/supabaseClient";
 import { signIn as authSignIn, signOut as authSignOut, getProfile } from "@/lib/auth";
 import type { Profile } from "@/types/profiles";
 import type { User } from "@supabase/supabase-js";

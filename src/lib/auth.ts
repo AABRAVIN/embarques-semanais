@@ -1,11 +1,5 @@
-import { supabase } from "./supabase";
+import { supabase } from "./supabaseClient";
 import type { Profile } from "@/types/profiles";
-
-type ProfileInsert = Omit<Profile, "id" | "created_at" | "updated_at"> & {
-  id: string;
-  created_at: string;
-  updated_at: string;
-};
 
 export async function signIn(email: string, password: string) {
   const { data, error } = await supabase.auth.signInWithPassword({
@@ -28,21 +22,6 @@ export async function signUp(
     options: { data: { nome, role } },
   });
   if (error) throw error;
-
-  if (data.user) {
-    const profileRow: ProfileInsert = {
-      id: data.user.id,
-      nome,
-      email,
-      role,
-      avatar_url: null,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    };
-    const { error: profileError } = await supabase.from("profiles").insert(profileRow as never);
-    if (profileError) throw profileError;
-  }
-
   return data;
 }
 
@@ -56,7 +35,7 @@ export async function getProfile(userId: string): Promise<Profile | null> {
     .from("profiles")
     .select("*")
     .eq("id", userId)
-    .single();
+    .maybeSingle();
   if (error) return null;
   return data;
 }

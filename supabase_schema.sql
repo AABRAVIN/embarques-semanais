@@ -53,6 +53,8 @@ CREATE TABLE IF NOT EXISTS embarques (
   obs               TEXT,
   status            TEXT NOT NULL DEFAULT 'standby'
                     CHECK (status IN ('confirmado','motorista_avisado','standby','sem_motorista','concluido')),
+  status_embarque   TEXT,
+  status_motorista  TEXT,
   destaque          TEXT NOT NULL DEFAULT '',
   confirmado_at     TIMESTAMPTZ,
   avisado_at        TIMESTAMPTZ,
@@ -154,6 +156,18 @@ CREATE INDEX IF NOT EXISTS idx_agenda_data_inicio      ON agenda(data_inicio);
 CREATE INDEX IF NOT EXISTS idx_ocorrencias_data        ON ocorrencias(data);
 CREATE INDEX IF NOT EXISTS idx_ocorrencias_status      ON ocorrencias(status);
 
+-- 10. MOTORISTAS VEICULOS (combined registry for Motoristas e Veiculos page)
+CREATE TABLE IF NOT EXISTS motoristas_veiculos (
+  id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  nome       TEXT NOT NULL,
+  placa1     TEXT NOT NULL DEFAULT '',
+  placa2     TEXT DEFAULT NULL,
+  capacidade TEXT NOT NULL,
+  carroceria TEXT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
 -- RLS (Row Level Security) básico
 ALTER TABLE profiles      ENABLE ROW LEVEL SECURITY;
 ALTER TABLE embarques     ENABLE ROW LEVEL SECURITY;
@@ -163,6 +177,7 @@ ALTER TABLE clientes      ENABLE ROW LEVEL SECURITY;
 ALTER TABLE agenda        ENABLE ROW LEVEL SECURITY;
 ALTER TABLE ocorrencias   ENABLE ROW LEVEL SECURITY;
 ALTER TABLE notifications ENABLE ROW LEVEL SECURITY;
+ALTER TABLE motoristas_veiculos ENABLE ROW LEVEL SECURITY;
 
 -- Políticas: leitura liberada para usuários autenticados
 CREATE POLICY select_authenticated ON profiles      FOR SELECT USING (auth.role() = 'authenticated');
@@ -173,6 +188,7 @@ CREATE POLICY select_authenticated ON clientes      FOR SELECT USING (auth.role(
 CREATE POLICY select_authenticated ON agenda        FOR SELECT USING (auth.role() = 'authenticated');
 CREATE POLICY select_authenticated ON ocorrencias   FOR SELECT USING (auth.role() = 'authenticated');
 CREATE POLICY select_authenticated ON notifications FOR SELECT USING (auth.role() = 'authenticated');
+CREATE POLICY select_authenticated ON motoristas_veiculos FOR SELECT USING (auth.role() = 'authenticated');
 
 -- Políticas de insert/update/delete para admins
 CREATE POLICY insert_admin ON profiles      FOR INSERT WITH CHECK (auth.role() = 'authenticated');
@@ -183,6 +199,7 @@ CREATE POLICY insert_admin ON clientes      FOR INSERT WITH CHECK (auth.role() =
 CREATE POLICY insert_admin ON agenda        FOR INSERT WITH CHECK (auth.role() = 'authenticated');
 CREATE POLICY insert_admin ON ocorrencias   FOR INSERT WITH CHECK (auth.role() = 'authenticated');
 CREATE POLICY insert_admin ON notifications FOR INSERT WITH CHECK (auth.role() = 'authenticated');
+CREATE POLICY insert_admin ON motoristas_veiculos FOR INSERT WITH CHECK (auth.role() = 'authenticated');
 
 CREATE POLICY update_admin ON profiles      FOR UPDATE USING (auth.role() = 'authenticated');
 CREATE POLICY update_admin ON embarques     FOR UPDATE USING (auth.role() = 'authenticated');
@@ -192,6 +209,7 @@ CREATE POLICY update_admin ON clientes      FOR UPDATE USING (auth.role() = 'aut
 CREATE POLICY update_admin ON agenda        FOR UPDATE USING (auth.role() = 'authenticated');
 CREATE POLICY update_admin ON ocorrencias   FOR UPDATE USING (auth.role() = 'authenticated');
 CREATE POLICY update_admin ON notifications FOR UPDATE USING (auth.role() = 'authenticated');
+CREATE POLICY update_admin ON motoristas_veiculos FOR UPDATE USING (auth.role() = 'authenticated');
 
 CREATE POLICY delete_admin ON profiles      FOR DELETE USING (auth.role() = 'authenticated');
 CREATE POLICY delete_admin ON embarques     FOR DELETE USING (auth.role() = 'authenticated');
@@ -201,3 +219,4 @@ CREATE POLICY delete_admin ON clientes      FOR DELETE USING (auth.role() = 'aut
 CREATE POLICY delete_admin ON agenda        FOR DELETE USING (auth.role() = 'authenticated');
 CREATE POLICY delete_admin ON ocorrencias   FOR DELETE USING (auth.role() = 'authenticated');
 CREATE POLICY delete_admin ON notifications FOR DELETE USING (auth.role() = 'authenticated');
+CREATE POLICY delete_admin ON motoristas_veiculos FOR DELETE USING (auth.role() = 'authenticated');
