@@ -328,9 +328,83 @@ export interface Database {
           }
         ]
       }
+      clientes: {
+        Row: {
+          id: string
+          nome: string
+          local: string | null
+          frete_acordado: string | null
+          cond_pagamento: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          nome: string
+          local?: string | null
+          frete_acordado?: string | null
+          cond_pagamento?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          nome?: string
+          local?: string | null
+          frete_acordado?: string | null
+          cond_pagamento?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+    }
+    logs: {
+      Row: {
+        id: string
+        tabela: string
+        registro_id: string
+        campo: string
+        valor_antigo: string | null
+        valor_novo: string | null
+        usuario_id: string | null
+        created_at: string
+      }
+      Insert: {
+        id?: string
+        tabela: string
+        registro_id: string
+        campo: string
+        valor_antigo?: string | null
+        valor_novo?: string | null
+        usuario_id?: string | null
+        created_at?: string
+      }
+      Update: {
+        id?: string
+        tabela?: string
+        registro_id?: string
+        campo?: string
+        valor_antigo?: string | null
+        valor_novo?: string | null
+        usuario_id?: string | null
+        created_at?: string
+      }
+      Relationships: [
+        {
+          foreignKeyName: "logs_usuario_id_fkey"
+          columns: ["usuario_id"]
+          referencedRelation: "profiles"
+          referencedColumns: ["id"]
+        }
+      ]
     }
     Views: Record<string, never>
     Functions: {
+      get_database_size: {
+        Args: Record<string, never>
+        Returns: number
+      }
       delete_from_fila_espera: {
         Args: { p_id: string }
         Returns: void

@@ -82,7 +82,7 @@ export function RightPanel() {
 
   useEffect(() => {
     const channel = supabase
-      .channel("ocorrencias-realtime")
+      .channel("public:ocorrencias")
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "ocorrencias" },

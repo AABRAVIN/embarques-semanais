@@ -4,6 +4,7 @@ import { Header } from "@/components/Header";
 import { Dashboard } from "@/pages/Dashboard";
 import { Configuracoes } from "@/pages/Configuracoes";
 import { MotoristasVeiculos } from "@/pages/MotoristasVeiculos";
+import { Clientes } from "@/pages/Clientes";
 import { Login } from "@/pages/Login";
 import { Navigate, Route, Routes } from "react-router-dom";
 import { OrdemChegada } from "@/pages/OrdemChegada";
@@ -34,6 +35,7 @@ function ProtectedLayout() {
             <Route path="/configuracoes" element={<Configuracoes />} />
             <Route path="/motoristas-veiculos" element={<MotoristasVeiculos />} />
             <Route path="/ordem-chegada" element={<OrdemChegada />} />
+            <Route path="/clientes" element={<Clientes />} />
             <Route path="*" element={<Dashboard />} />
           </Routes>
         </main>

@@ -4,7 +4,9 @@ import { DashboardCards } from "@/components/DashboardCards";
 import { EmbarquesTable } from "@/components/EmbarquesTable";
 import { RightPanel } from "@/components/RightPanel";
 import { DayNav } from "@/components/DayNav";
+import { StorageBar } from "@/components/StorageBar";
 import { listEmbarques, createEmbarque, updateEmbarque, countByEmbStatus, countByMotStatus, searchEmbarques } from "@/lib/embarques";
+import { supabase } from "@/lib/supabaseClient";
 import { listMotoristasVeiculos } from "@/lib/motoristasVeiculos";
 import type { Embarque } from "@/types/embarque";
 import type { MotoristaVeiculo } from "@/types/motoristaVeiculo";
@@ -219,6 +221,38 @@ export function Dashboard() {
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
+  // Realtime: escuta mudanças na tabela embarques e atualiza estado local
+  useEffect(() => {
+    const channel = supabase
+      .channel("public:embarques")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "embarques" },
+        (payload) => {
+          if (payload.eventType === "INSERT") {
+            setEmbarques((prev) => [payload.new as Embarque, ...prev]);
+          } else if (payload.eventType === "UPDATE") {
+            setEmbarques((prev) =>
+              prev.map((e) =>
+                e.id === (payload.new as Embarque).id
+                  ? { ...e, ...(payload.new as Embarque) }
+                  : e
+              )
+            );
+          } else if (payload.eventType === "DELETE") {
+            setEmbarques((prev) =>
+              prev.filter((e) => e.id !== (payload.old as Embarque).id)
+            );
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
 
   // Global search — debounced, no date filter
   useEffect(() => {
@@ -554,6 +588,7 @@ export function Dashboard() {
             dateTo={dateTo}
           />
         )}
+        <StorageBar />
       </div>
 
       <RightPanel />

@@ -5,7 +5,9 @@ import { Check, X, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ActionDropdown } from "./ActionDropdown";
 import { Pagination } from "./Pagination";
-import { updateEmbarqueEmbStatus, updateEmbarqueMotStatus, clearEmbarqueMotStatus } from "@/lib/embarques";
+import { updateEmbarqueEmbStatus, updateEmbarqueMotStatus, clearEmbarqueMotStatus, updateEmbarqueMotorista, updateEmbarqueObs } from "@/lib/embarques";
+import { useAuth } from "@/hooks/use-auth";
+import { EditableCell } from "./EditableCell";
 import type { Embarque, EmbStatus, MotStatus } from "@/types/embarque";
 
 const STATUS_STYLE: Record<string, string> = {
@@ -156,6 +158,17 @@ function TableRow({ emb, onAction, onEdit }: { emb: Embarque; onAction?: () => v
   const embRef = useRef<HTMLButtonElement>(null);
   const motRef = useRef<HTMLButtonElement>(null);
   const [selectorPos, setSelectorPos] = useState<{ top: number; left: number }>({ top: 0, left: 0 });
+  const { user } = useAuth();
+
+  async function handleSaveMotorista(newValue: string) {
+    await updateEmbarqueMotorista(emb.id, newValue, emb.motorista, user?.id ?? null);
+    onAction?.();
+  }
+
+  async function handleSaveObs(newValue: string) {
+    await updateEmbarqueObs(emb.id, newValue, emb.obs, user?.id ?? null);
+    onAction?.();
+  }
 
   const updateSelectorPosition = useCallback((el: HTMLElement) => {
     const rect = el.getBoundingClientRect();
@@ -427,10 +440,23 @@ function TableRow({ emb, onAction, onEdit }: { emb: Embarque; onAction?: () => v
                           <span className="font-medium text-foreground">Cliente:</span> {clienteNome}{entregaLocaisStr ? ` ${entregaLocaisStr}` : ""}
                         </div>
                         <div>
-                          <span className="font-medium text-foreground">Motorista:</span> {emb.motorista || "-"}
+                          <span className="font-medium text-foreground">Motorista:</span>{" "}
+                          <EditableCell
+                            value={emb.motorista || ""}
+                            onSave={handleSaveMotorista}
+                            placeholder="Sem motorista"
+                            displayClass="font-medium text-foreground"
+                          />
                         </div>
                         <div className="pt-1 border-t border-border/40">
-                          <span className="font-medium text-foreground">Placa:</span> {emb.placa || "-"} | <span className="font-medium text-foreground">Observações:</span> {obsStr}
+                          <span className="font-medium text-foreground">Placa:</span> {emb.placa || "-"} | <span className="font-medium text-foreground">Observações:</span>{" "}
+                          <EditableCell
+                            value={emb.obs?.trim() || ""}
+                            onSave={handleSaveObs}
+                            placeholder="Sem observações"
+                            type="textarea"
+                            displayClass="text-muted-foreground"
+                          />
                         </div>
                       </div>
                       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">

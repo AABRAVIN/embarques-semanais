@@ -1,6 +1,59 @@
 import { supabase } from "./supabaseClient";
 import type { Embarque, EmbarqueStatus, EmbStatus, MotStatus } from "@/types/embarque";
 
+export async function logChange(params: {
+  registro_id: string;
+  campo: string;
+  valor_antigo: string | null;
+  valor_novo: string | null;
+  usuario_id: string | null;
+}) {
+  const { error } = await supabase
+    .from("logs")
+    .insert([{ tabela: "embarques", ...params }] as never);
+  if (error) console.error("Erro ao registrar log:", error);
+}
+
+export async function updateEmbarqueMotorista(
+  id: string,
+  motorista: string,
+  oldMotorista: string | null,
+  usuarioId: string | null
+) {
+  const { error } = await supabase
+    .from("embarques")
+    .update({ motorista: motorista || null, updated_at: new Date().toISOString() } as never)
+    .eq("id", id);
+  if (error) throw error;
+  await logChange({
+    registro_id: id,
+    campo: "motorista",
+    valor_antigo: oldMotorista,
+    valor_novo: motorista || null,
+    usuario_id: usuarioId,
+  });
+}
+
+export async function updateEmbarqueObs(
+  id: string,
+  obs: string,
+  oldObs: string | null,
+  usuarioId: string | null
+) {
+  const { error } = await supabase
+    .from("embarques")
+    .update({ obs: obs || null, updated_at: new Date().toISOString() } as never)
+    .eq("id", id);
+  if (error) throw error;
+  await logChange({
+    registro_id: id,
+    campo: "obs",
+    valor_antigo: oldObs,
+    valor_novo: obs || null,
+    usuario_id: usuarioId,
+  });
+}
+
 export async function createEmbarque(input: {
   data: string;
   fornecedor: string;

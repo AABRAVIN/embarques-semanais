@@ -8,4 +8,5 @@ export type { Notification, NotificationInput } from "./notifications";
 export type { Message, MessageInput, MessageStatus } from "./messages";
 export type { MotoristaVeiculo } from "./motoristaVeiculo";
 export type { Lembrete, LembreteInput } from "./lembretes";
+export type { Cliente } from "./clientes";
 export type { Database } from "./database";
