@@ -14,7 +14,7 @@ import {
   X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { updateEmbarqueEmbStatus, updateEmbarqueMotStatus, deleteEmbarque, moveEmbarqueDate } from "@/lib/embarques";
 import type { EmbStatus, MotStatus } from "@/types/embarque";
 import type { Embarque } from "@/types/embarque";
@@ -171,44 +171,33 @@ export function ActionDropdown({ embarqueId, embarque, currentEmbStatus, current
         <MoreHorizontal className="h-4 w-4" />
       </button>
 
-      {createPortal(
-        <AnimatePresence>
-          {open && (
-            <>
-              <motion.div
-                key="action-backdrop"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.1 }}
-                className="fixed inset-0 z-[9998]"
-                onClick={() => setOpen(false)}
-              />
-              <motion.div
-                key="action-dropdown"
-                initial={{ opacity: 0, scale: 0.95, y: -4 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95, y: -4 }}
-                transition={{ duration: 0.12 }}
-                className="fixed z-[9999] w-56 overflow-y-auto rounded-xl border border-border bg-card py-1 shadow-2xl shadow-glow"
-                style={{ top: pos.top, bottom: pos.bottom, right: pos.right, maxHeight: "80vh" }}
-              >
-                <div className={headerClass}>Ações de Embarque</div>
-                {renderGroup(EMB_GROUP, currentEmbStatus)}
+      {open && createPortal(
+        <>
+          <div
+            className="fixed inset-0 z-[9998]"
+            onClick={() => setOpen(false)}
+          />
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95, y: -4 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ duration: 0.12 }}
+            className="fixed z-[9999] w-56 overflow-y-auto rounded-xl border border-border bg-card py-1 shadow-2xl shadow-glow"
+            style={{ top: pos.top, bottom: pos.bottom, right: pos.right, maxHeight: "80vh" }}
+          >
+            <div className={headerClass}>Ações de Embarque</div>
+            {renderGroup(EMB_GROUP, currentEmbStatus)}
 
-                <div className={separatorClass} />
+            <div className={separatorClass} />
 
-                <div className={headerClass}>Ações de Motorista</div>
-                {renderGroup(MOT_GROUP, currentMotStatus)}
+            <div className={headerClass}>Ações de Motorista</div>
+            {renderGroup(MOT_GROUP, currentMotStatus)}
 
-                <div className={separatorClass} />
+            <div className={separatorClass} />
 
-                <div className={headerClass}>Ações</div>
-                {renderGroup(ACTION_GROUP)}
-              </motion.div>
-            </>
-          )}
-        </AnimatePresence>,
+            <div className={headerClass}>Ações</div>
+            {renderGroup(ACTION_GROUP)}
+          </motion.div>
+        </>,
         document.body
       )}
 

@@ -3,24 +3,23 @@ import { createPortal } from "react-dom";
 import {
   Bell,
   Send,
-  CheckCircle2,
-  AlertTriangle,
-  Info,
   User,
+  Users,
+  Trash2,
+  CheckCircle2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
-import { useNotifications } from "@/hooks/use-notifications";
-
-const TYPE_ICON: Record<string, typeof Bell> = {
-  info: Info,
-  warning: AlertTriangle,
-  success: CheckCircle2,
-};
+import { useMessages } from "@/hooks/use-messages";
+import type { MessageInput } from "@/types/messages";
+import { useAuth } from "@/hooks/use-auth";
+import { listProfiles } from "@/lib/auth";
+import type { Profile } from "@/types/profiles";
 
 export function NotificationsPopover() {
-  const { notifications, unreadCount, loading, send, markRead } =
-    useNotifications();
+  const { user, profile } = useAuth();
+  const { messages, unreadCount, loading, send, markRead, hide } =
+    useMessages(user?.id);
   const [open, setOpen] = useState(false);
   const [tab, setTab] = useState<"list" | "send">("list");
   const [title, setTitle] = useState("");
@@ -28,7 +27,10 @@ export function NotificationsPopover() {
   const [recipientType, setRecipientType] = useState<"usuario" | "todos">(
     "todos"
   );
+  const [recipientId, setRecipientId] = useState("");
+  const [profiles, setProfiles] = useState<Profile[]>([]);
   const [sending, setSending] = useState(false);
+  const [sendError, setSendError] = useState("");
   const buttonRef = useRef<HTMLButtonElement>(null);
   const [pos, setPos] = useState({ top: 0, right: 0 });
 
@@ -53,23 +55,52 @@ export function NotificationsPopover() {
     };
   }, [open, updatePosition]);
 
+  useEffect(() => {
+    listProfiles().then(setProfiles).catch(console.error);
+  }, []);
+
   async function handleSend(e: React.FormEvent) {
     e.preventDefault();
+    setSendError("");
+
+    const data: MessageInput = {
+      content: `${title.trim()}\n${message.trim()}`,
+      recipient_id: recipientType === "usuario" ? recipientId : null,
+    };
+    console.log("📤 Dados da mensagem para envio:", data);
+    console.log("👤 user?.id:", user?.id);
+    console.log("👤 user?.email:", user?.email);
+    console.log("👤 user?.role:", user?.role);
+    console.log("👤 profile:", profile);
+
     if (!title.trim() || !message.trim()) return;
+    if (recipientType === "usuario" && !recipientId) return;
 
     setSending(true);
     try {
-      await send({
-        title: title.trim(),
-        message: message.trim(),
-        recipient_type: recipientType,
-        recipient_id: undefined,
-      });
+      await send(data);
       setTitle("");
       setMessage("");
+      setRecipientId("");
       setTab("list");
     } catch (err) {
-      console.error("Erro ao enviar notificação:", err);
+      console.group("❌ Erro ao enviar mensagem");
+      console.error("Objeto do erro:", err);
+      if (err && typeof err === "object") {
+        console.error("code:", (err as Record<string, unknown>).code);
+        console.error("details:", (err as Record<string, unknown>).details);
+        console.error("hint:", (err as Record<string, unknown>).hint);
+        console.error("message:", (err as Record<string, unknown>).message);
+        console.error("statusCode:", (err as Record<string, unknown>).statusCode);
+      }
+      console.groupEnd();
+      const msg =
+        err instanceof Error
+          ? err.message
+          : err && typeof err === "object" && "message" in (err as Record<string, unknown>)
+            ? String((err as Record<string, unknown>).message)
+            : String(err);
+      setSendError(msg);
     } finally {
       setSending(false);
     }
@@ -127,7 +158,7 @@ export function NotificationsPopover() {
                 >
                   {/* Header */}
                   <div className="flex items-center justify-between border-b border-border px-4 py-3">
-                    <h3 className="text-sm font-semibold">Notificações</h3>
+                    <h3 className="text-sm font-semibold">Mensagens</h3>
                     <div className="flex items-center gap-1 rounded-lg bg-muted p-0.5">
                       <button
                         onClick={() => setTab("list")}
@@ -162,54 +193,68 @@ export function NotificationsPopover() {
                             <div key={i} className="h-16 animate-pulse rounded-lg bg-muted" />
                           ))}
                         </div>
-                      ) : notifications.length === 0 ? (
+                      ) : messages.length === 0 ? (
                         <div className="flex flex-col items-center gap-2 py-12 text-muted-foreground">
                           <Bell className="h-8 w-8 opacity-30" />
-                          <p className="text-sm">Nenhuma notificação</p>
+                          <p className="text-sm">Nenhuma mensagem</p>
                         </div>
                       ) : (
                         <div className="divide-y divide-border">
-                          {notifications.map((notif) => {
-                            const isUnread = !notif.read_at;
-                            return (
-                              <button
-                                key={notif.id}
-                                onClick={() => { if (isUnread) markRead(notif.id); }}
-                                className={cn(
-                                  "flex w-full items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-accent/50",
-                                  isUnread && "bg-accent/20"
+                          {messages.map((msg) => (
+                            <div
+                              key={msg.id}
+                              className="flex items-start gap-3 px-4 py-3 transition-colors hover:bg-accent/50 group"
+                            >
+                              <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground">
+                                {!msg.recipient_id ? (
+                                  <Users className="h-3.5 w-3.5" />
+                                ) : (
+                                  <User className="h-3.5 w-3.5" />
                                 )}
+                              </div>
+                              <div
+                                className="flex-1 min-w-0 cursor-pointer"
+                                onClick={() => markRead(msg.id)}
                               >
-                                <div
-                                  className={cn(
-                                    "mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full",
-                                    isUnread ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"
-                                  )}
-                                >
-                                  <Bell className="h-3.5 w-3.5" />
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                  <div className="flex items-center gap-2">
-                                    <p className={cn("text-sm truncate", isUnread && "font-semibold")}>
-                                      {notif.title}
-                                    </p>
-                                    {isUnread && <span className="h-2 w-2 shrink-0 rounded-full bg-primary" />}
-                                  </div>
-                                  <p className="mt-0.5 text-xs text-muted-foreground line-clamp-2">
-                                    {notif.message}
-                                  </p>
-                                  <p className="mt-1 text-[10px] text-muted-foreground/60">
-                                    {new Date(notif.created_at).toLocaleString("pt-BR")}
+                                <div className="flex items-center gap-2">
+                                  <p className="text-sm truncate font-semibold">
+                                    {msg.content.split('\n')[0]}
                                   </p>
                                 </div>
-                                {notif.recipient_type === "todos" && (
-                                  <span className="shrink-0 rounded-md bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground">
+                                <p className="mt-0.5 text-xs text-muted-foreground line-clamp-2 whitespace-pre-line">
+                                  {msg.content.split('\n').slice(1).join('\n') || msg.content}
+                                </p>
+                                <p className="mt-1 text-[10px] text-muted-foreground/60">
+                                  {new Date(msg.created_at).toLocaleString("pt-BR")}
+                                </p>
+                              </div>
+                              <div className="flex items-center gap-1 shrink-0">
+                                {!msg.recipient_id ? (
+                                  <span className="rounded-md bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground">
                                     Todos
                                   </span>
+                                ) : (
+                                  <span className="rounded-md bg-primary/10 px-1.5 py-0.5 text-[10px] text-primary">
+                                    Direta
+                                  </span>
                                 )}
-                              </button>
-                            );
-                          })}
+                                <button
+                                  onClick={() => markRead(msg.id)}
+                                  className="flex h-6 w-6 items-center justify-center rounded text-muted-foreground/40 opacity-0 transition-all hover:bg-primary/10 hover:text-primary group-hover:opacity-100"
+                                  title="Marcar como lida"
+                                >
+                                  <CheckCircle2 className="h-3.5 w-3.5" />
+                                </button>
+                                <button
+                                  onClick={() => hide(msg.id)}
+                                  className="flex h-6 w-6 items-center justify-center rounded text-muted-foreground/40 opacity-0 transition-all hover:bg-destructive/10 hover:text-destructive group-hover:opacity-100"
+                                  title="Apagar mensagem"
+                                >
+                                  <Trash2 className="h-3.5 w-3.5" />
+                                </button>
+                              </div>
+                            </div>
+                          ))}
                         </div>
                       )}
                     </div>
@@ -223,7 +268,7 @@ export function NotificationsPopover() {
                           <div className="flex gap-2">
                             <button
                               type="button"
-                              onClick={() => setRecipientType("todos")}
+                              onClick={() => { setRecipientType("todos"); setRecipientId(""); }}
                               className={cn(
                                 "flex flex-1 items-center justify-center gap-1.5 rounded-lg border px-3 py-2 text-xs font-medium transition-colors",
                                 recipientType === "todos"
@@ -231,7 +276,7 @@ export function NotificationsPopover() {
                                   : "border-border text-muted-foreground hover:bg-accent"
                               )}
                             >
-                              <Send className="h-3.5 w-3.5" />
+                              <Users className="h-3.5 w-3.5" />
                               Todos
                             </button>
                             <button
@@ -249,6 +294,29 @@ export function NotificationsPopover() {
                             </button>
                           </div>
                         </div>
+
+                        {recipientType === "usuario" && (
+                          <div>
+                            <label className="mb-1 block text-xs font-medium text-muted-foreground">
+                              Selecionar Usuário
+                            </label>
+                            <select
+                              value={recipientId}
+                              onChange={(e) => setRecipientId(e.target.value)}
+                              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
+                            >
+                              <option value="">Selecione um usuário...</option>
+                              {profiles
+                                .filter((p) => p.id !== user?.id)
+                                .map((p) => (
+                                  <option key={p.id} value={p.id}>
+                                    {p.nome} ({p.email})
+                                  </option>
+                                ))}
+                            </select>
+                          </div>
+                        )}
+
                         <div>
                           <label className="mb-1 block text-xs font-medium text-muted-foreground">Título</label>
                           <input
@@ -269,13 +337,21 @@ export function NotificationsPopover() {
                             className="w-full resize-none rounded-lg border border-border bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
                           />
                         </div>
+                        {sendError && (
+                          <p className="text-xs text-destructive">{sendError}</p>
+                        )}
                         <button
                           type="submit"
-                          disabled={!title.trim() || !message.trim() || sending}
+                          disabled={
+                            !title.trim() ||
+                            !message.trim() ||
+                            sending ||
+                            (recipientType === "usuario" && !recipientId)
+                          }
                           className="flex items-center justify-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50"
                         >
                           <Send className="h-4 w-4" />
-                          {sending ? "Enviando..." : "Enviar aviso"}
+                          {sending ? "Enviando..." : "Enviar mensagem"}
                         </button>
                       </div>
                     </form>

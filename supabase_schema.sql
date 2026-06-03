@@ -134,7 +134,59 @@ CREATE TABLE IF NOT EXISTS ocorrencias (
   updated_at  TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
--- 8. NOTIFICATIONS
+-- 8. FILA_ESPERA (Ordem de Chegada)
+CREATE TABLE IF NOT EXISTS fila_espera (
+  id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  pos        INTEGER NOT NULL,
+  veiculo    TEXT NOT NULL,
+  categoria  TEXT NOT NULL CHECK (categoria IN ('VANDERLEIA','CARRETA LS','BITRUCK','BITREM')),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_fila_espera_pos ON fila_espera(pos);
+CREATE INDEX IF NOT EXISTS idx_fila_espera_categoria ON fila_espera(categoria);
+
+-- RPC: delete_from_fila_espera
+CREATE OR REPLACE FUNCTION delete_from_fila_espera(p_id UUID)
+RETURNS void
+LANGUAGE plpgsql
+SECURITY DEFINER SET search_path = ''
+AS $$
+DECLARE
+  v_pos INTEGER;
+  v_cat TEXT;
+BEGIN
+  SELECT pos, categoria INTO v_pos, v_cat FROM fila_espera WHERE id = p_id;
+  DELETE FROM fila_espera WHERE id = p_id;
+  UPDATE fila_espera SET pos = pos - 1 WHERE categoria = v_cat AND pos > v_pos;
+END;
+$$;
+
+-- RPC: reorder_fila_espera
+CREATE OR REPLACE FUNCTION reorder_fila_espera(p_id UUID, p_new_pos INTEGER)
+RETURNS void
+LANGUAGE plpgsql
+SECURITY DEFINER SET search_path = ''
+AS $$
+DECLARE
+  v_old_pos INTEGER;
+  v_cat TEXT;
+  v_max_pos INTEGER;
+BEGIN
+  SELECT pos, categoria INTO v_old_pos, v_cat FROM fila_espera WHERE id = p_id;
+  SELECT COALESCE(MAX(pos), 0) INTO v_max_pos FROM fila_espera WHERE categoria = v_cat;
+  p_new_pos := GREATEST(1, LEAST(p_new_pos, v_max_pos));
+  IF p_new_pos = v_old_pos THEN RETURN; END IF;
+  IF p_new_pos < v_old_pos THEN
+    UPDATE fila_espera SET pos = pos + 1 WHERE categoria = v_cat AND pos >= p_new_pos AND pos < v_old_pos;
+  ELSE
+    UPDATE fila_espera SET pos = pos - 1 WHERE categoria = v_cat AND pos > v_old_pos AND pos <= p_new_pos;
+  END IF;
+  UPDATE fila_espera SET pos = p_new_pos WHERE id = p_id;
+END;
+$$;
+
+-- 9. NOTIFICATIONS
 CREATE TABLE IF NOT EXISTS notifications (
   id             UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   title          TEXT NOT NULL,
@@ -155,6 +207,33 @@ CREATE INDEX IF NOT EXISTS idx_notifications_created   ON notifications(created_
 CREATE INDEX IF NOT EXISTS idx_agenda_data_inicio      ON agenda(data_inicio);
 CREATE INDEX IF NOT EXISTS idx_ocorrencias_data        ON ocorrencias(data);
 CREATE INDEX IF NOT EXISTS idx_ocorrencias_status      ON ocorrencias(status);
+
+-- 11. MESSAGES (Chat / Broadcast)
+CREATE TABLE IF NOT EXISTS messages (
+  id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  title        TEXT NOT NULL,
+  message      TEXT NOT NULL,
+  sender_id    UUID REFERENCES profiles(id) ON DELETE SET NULL,
+  recipient_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
+  created_at   TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_messages_recipient ON messages(recipient_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_messages_created   ON messages(created_at DESC);
+
+-- 12. MESSAGE_STATUS (per-user read/delete tracking)
+CREATE TABLE IF NOT EXISTS message_status (
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  message_id  UUID NOT NULL REFERENCES messages(id) ON DELETE CASCADE,
+  user_id     UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  is_read     BOOLEAN NOT NULL DEFAULT false,
+  is_deleted  BOOLEAN NOT NULL DEFAULT false,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
+  UNIQUE(message_id, user_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_message_status_user ON message_status(user_id, is_deleted);
 
 -- 10. MOTORISTAS VEICULOS (combined registry for Motoristas e Veiculos page)
 CREATE TABLE IF NOT EXISTS motoristas_veiculos (
@@ -178,6 +257,9 @@ ALTER TABLE agenda        ENABLE ROW LEVEL SECURITY;
 ALTER TABLE ocorrencias   ENABLE ROW LEVEL SECURITY;
 ALTER TABLE notifications ENABLE ROW LEVEL SECURITY;
 ALTER TABLE motoristas_veiculos ENABLE ROW LEVEL SECURITY;
+ALTER TABLE fila_espera ENABLE ROW LEVEL SECURITY;
+ALTER TABLE messages ENABLE ROW LEVEL SECURITY;
+ALTER TABLE message_status ENABLE ROW LEVEL SECURITY;
 
 -- Políticas: leitura liberada para usuários autenticados
 CREATE POLICY select_authenticated ON profiles      FOR SELECT USING (auth.role() = 'authenticated');
@@ -189,6 +271,9 @@ CREATE POLICY select_authenticated ON agenda        FOR SELECT USING (auth.role(
 CREATE POLICY select_authenticated ON ocorrencias   FOR SELECT USING (auth.role() = 'authenticated');
 CREATE POLICY select_authenticated ON notifications FOR SELECT USING (auth.role() = 'authenticated');
 CREATE POLICY select_authenticated ON motoristas_veiculos FOR SELECT USING (auth.role() = 'authenticated');
+CREATE POLICY select_authenticated ON fila_espera FOR SELECT USING (auth.role() = 'authenticated');
+CREATE POLICY select_authenticated ON messages FOR SELECT USING (auth.role() = 'authenticated');
+CREATE POLICY select_authenticated ON message_status FOR SELECT USING (auth.role() = 'authenticated');
 
 -- Políticas de insert/update/delete para admins
 CREATE POLICY insert_admin ON profiles      FOR INSERT WITH CHECK (auth.role() = 'authenticated');
@@ -200,6 +285,9 @@ CREATE POLICY insert_admin ON agenda        FOR INSERT WITH CHECK (auth.role() =
 CREATE POLICY insert_admin ON ocorrencias   FOR INSERT WITH CHECK (auth.role() = 'authenticated');
 CREATE POLICY insert_admin ON notifications FOR INSERT WITH CHECK (auth.role() = 'authenticated');
 CREATE POLICY insert_admin ON motoristas_veiculos FOR INSERT WITH CHECK (auth.role() = 'authenticated');
+CREATE POLICY insert_admin ON fila_espera FOR INSERT WITH CHECK (auth.role() = 'authenticated');
+CREATE POLICY insert_admin ON messages FOR INSERT WITH CHECK (auth.role() = 'authenticated');
+CREATE POLICY insert_admin ON message_status FOR INSERT WITH CHECK (auth.role() = 'authenticated');
 
 CREATE POLICY update_admin ON profiles      FOR UPDATE USING (auth.role() = 'authenticated');
 CREATE POLICY update_admin ON embarques     FOR UPDATE USING (auth.role() = 'authenticated');
@@ -210,6 +298,8 @@ CREATE POLICY update_admin ON agenda        FOR UPDATE USING (auth.role() = 'aut
 CREATE POLICY update_admin ON ocorrencias   FOR UPDATE USING (auth.role() = 'authenticated');
 CREATE POLICY update_admin ON notifications FOR UPDATE USING (auth.role() = 'authenticated');
 CREATE POLICY update_admin ON motoristas_veiculos FOR UPDATE USING (auth.role() = 'authenticated');
+CREATE POLICY update_admin ON fila_espera FOR UPDATE USING (auth.role() = 'authenticated');
+CREATE POLICY update_admin ON message_status FOR UPDATE USING (auth.role() = 'authenticated');
 
 CREATE POLICY delete_admin ON profiles      FOR DELETE USING (auth.role() = 'authenticated');
 CREATE POLICY delete_admin ON embarques     FOR DELETE USING (auth.role() = 'authenticated');
@@ -220,3 +310,4 @@ CREATE POLICY delete_admin ON agenda        FOR DELETE USING (auth.role() = 'aut
 CREATE POLICY delete_admin ON ocorrencias   FOR DELETE USING (auth.role() = 'authenticated');
 CREATE POLICY delete_admin ON notifications FOR DELETE USING (auth.role() = 'authenticated');
 CREATE POLICY delete_admin ON motoristas_veiculos FOR DELETE USING (auth.role() = 'authenticated');
+CREATE POLICY delete_admin ON fila_espera FOR DELETE USING (auth.role() = 'authenticated');

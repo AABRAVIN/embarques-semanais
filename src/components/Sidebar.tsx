@@ -3,11 +3,8 @@ import { useLocation, useNavigate, Link } from "react-router-dom";
 import {
   LayoutDashboard,
   Truck,
-  Calendar,
-  AlertTriangle,
   Users,
   Building2,
-  Bell,
   BarChart3,
   ScrollText,
   Settings,
@@ -23,12 +20,9 @@ import { useAuth } from "@/hooks/use-auth";
 
 const NAV_ITEMS = [
   { label: "Dashboard", icon: LayoutDashboard, href: "/", adminOnly: false },
-  { label: "Embarques", icon: Truck, href: "/embarques", adminOnly: false },
-  { label: "Agenda", icon: Calendar, href: "/agenda", adminOnly: false },
-  { label: "Ocorrências", icon: AlertTriangle, href: "/ocorrencias", adminOnly: false },
+  { label: "Ordem de Chegada", icon: Truck, href: "/ordem-chegada", adminOnly: false },
   { label: "Motoristas e Veículos", icon: Users, href: "/motoristas-veiculos", adminOnly: false },
   { label: "Clientes", icon: Building2, href: "/clientes", adminOnly: false },
-  { label: "Notificações", icon: Bell, href: "/notificacoes", badge: 3, adminOnly: false },
   { label: "Relatórios", icon: BarChart3, href: "/relatorios", adminOnly: false },
   { label: "Logs", icon: ScrollText, href: "/logs", adminOnly: false },
   { label: "Usuários", icon: Shield, href: "/usuarios", adminOnly: true },
@@ -131,11 +125,6 @@ export function Sidebar({ activePath: _activePath }: SidebarProps) {
                     <Icon className="h-5 w-5 shrink-0" />
                     {!collapsed && <span>{item.label}</span>}
                   </span>
-                  {!collapsed && item.badge && (
-                    <span className="relative z-10 ml-auto flex h-5 min-w-[20px] items-center justify-center rounded-full bg-primary/20 px-1.5 text-[11px] font-semibold text-primary">
-                      {item.badge}
-                    </span>
-                  )}
                 </Link>
               </motion.li>
             );

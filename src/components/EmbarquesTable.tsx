@@ -285,32 +285,6 @@ function TableRow({ emb, onAction, onEdit }: { emb: Embarque; onAction?: () => v
         <td className="whitespace-nowrap px-4 py-3.5 text-xs text-muted-foreground">
           {formatDate(emb.data)}
         </td>
-        <td className="whitespace-nowrap px-4 py-3.5 text-xs text-muted-foreground">
-          {emb.confirmado_at ? (
-            <span className="flex items-center gap-1">
-              <Check className="h-3 w-3 text-emerald-500" />
-              {formatDate(emb.confirmado_at)}
-            </span>
-          ) : (
-            <span className="flex items-center gap-1 text-muted-foreground">
-              <X className="h-3 w-3 text-red-400" />
-              Pendente
-            </span>
-          )}
-        </td>
-        <td className="whitespace-nowrap px-4 py-3.5 text-xs text-muted-foreground">
-          {emb.avisado_at ? (
-            <span className="flex items-center gap-1">
-              <Check className="h-3 w-3 text-emerald-500" />
-              {formatDate(emb.avisado_at)}
-            </span>
-          ) : (
-            <span className="flex items-center gap-1 text-muted-foreground">
-              <X className="h-3 w-3 text-red-400" />
-              Pendente
-            </span>
-          )}
-        </td>
         <td className="whitespace-nowrap px-4 py-3.5">
           <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
             <ActionDropdown
@@ -433,7 +407,7 @@ function TableRow({ emb, onAction, onEdit }: { emb: Embarque; onAction?: () => v
             transition={{ duration: 0.3, ease: "easeInOut" }}
             className="border-b border-border bg-muted/30 overflow-hidden"
           >
-              <td colSpan={9} className="px-4 py-3">
+              <td colSpan={7} className="px-4 py-3">
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -527,12 +501,12 @@ export function EmbarquesTable({ embarques, onAction, onEdit, selectedDate, date
       </div>
 
       {/* Premium glass table */}
-      <div className="overflow-hidden rounded-xl border border-border bg-card transition-shadow duration-200 hover:shadow-glow">
+      <div className="overflow-visible rounded-xl border border-border bg-card transition-shadow duration-200 hover:shadow-glow">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead>
               <tr className="border-b border-border bg-muted">
-                {["ID", "Cliente", "Origem → Destino", "Status da Carga", "Status Motorista", "Data do Embarque", "Confirmado", "Avisado"].map((h) => (
+                {["ID", "Cliente", "Origem → Destino", "Status da Carga", "Status Motorista", "Data do Embarque"].map((h) => (
                   <th key={h} className="whitespace-nowrap px-4 py-3 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
                     {h}
                   </th>
@@ -543,7 +517,7 @@ export function EmbarquesTable({ embarques, onAction, onEdit, selectedDate, date
             <tbody>
               {embarques.length === 0 ? (
                 <tr>
-                  <td colSpan={9} className="px-4 py-16 text-center text-sm text-muted-foreground">
+                  <td colSpan={7} className="px-4 py-16 text-center text-sm text-muted-foreground">
                     <div className="flex flex-col items-center gap-2">
                       <span className="text-3xl opacity-20">📦</span>
                       <span>Nenhum embarque encontrado</span>

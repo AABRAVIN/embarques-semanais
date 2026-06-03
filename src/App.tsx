@@ -6,6 +6,7 @@ import { Configuracoes } from "@/pages/Configuracoes";
 import { MotoristasVeiculos } from "@/pages/MotoristasVeiculos";
 import { Login } from "@/pages/Login";
 import { Navigate, Route, Routes } from "react-router-dom";
+import { OrdemChegada } from "@/pages/OrdemChegada";
 
 function ProtectedLayout() {
   const { user, loading } = useAuth();
@@ -32,6 +33,7 @@ function ProtectedLayout() {
             <Route path="/" element={<Dashboard />} />
             <Route path="/configuracoes" element={<Configuracoes />} />
             <Route path="/motoristas-veiculos" element={<MotoristasVeiculos />} />
+            <Route path="/ordem-chegada" element={<OrdemChegada />} />
             <Route path="*" element={<Dashboard />} />
           </Routes>
         </main>

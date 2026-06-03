@@ -8,9 +8,7 @@ import {
   subscribeNotifications,
 } from "@/lib/notifications";
 
-const CURRENT_USER_ID = undefined;
-
-export function useNotifications() {
+export function useNotifications(userId?: string) {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -18,8 +16,8 @@ export function useNotifications() {
   const loadData = useCallback(async () => {
     try {
       const [notifs, count] = await Promise.all([
-        fetchNotifications(CURRENT_USER_ID),
-        getUnreadCount(CURRENT_USER_ID),
+        fetchNotifications(userId),
+        getUnreadCount(userId),
       ]);
       setNotifications(notifs);
       setUnreadCount(count);
@@ -28,21 +26,21 @@ export function useNotifications() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [userId]);
 
   useEffect(() => {
     loadData();
   }, [loadData]);
 
   useEffect(() => {
-    const unsubscribe = subscribeNotifications(CURRENT_USER_ID, () => {
+    const unsubscribe = subscribeNotifications(userId, () => {
       loadData();
     });
     return unsubscribe;
-  }, [loadData]);
+  }, [userId, loadData]);
 
   async function send(input: NotificationInput) {
-    await sendNotification(input, CURRENT_USER_ID);
+    await sendNotification(input, userId);
   }
 
   async function markRead(id: string) {

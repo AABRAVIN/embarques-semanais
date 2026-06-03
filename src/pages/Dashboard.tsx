@@ -323,10 +323,12 @@ export function Dashboard() {
     setModalOpen(true);
   }
 
-  function closeModal() {
-    const current = JSON.stringify(form);
-    if (current !== initialFormRef.current) {
-      if (!window.confirm("Deseja descartar as alterações?")) return;
+  function closeModal(force?: boolean) {
+    if (!force) {
+      const current = JSON.stringify(form);
+      if (current !== initialFormRef.current) {
+        if (!window.confirm("Deseja descartar as alterações?")) return;
+      }
     }
     setModalOpen(false);
     resetForm();
@@ -396,7 +398,7 @@ export function Dashboard() {
       } else {
         await createEmbarque(payload);
       }
-      closeModal();
+      closeModal(true);
       fetchData();
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Erro ao salvar embarque.";
@@ -647,7 +649,7 @@ export function Dashboard() {
                         <h2 className="text-sm font-semibold">{editingId ? "Editar embarque" : "Novo embarque"}</h2>
                       </div>
                       <button
-                        onClick={closeModal}
+                        onClick={() => closeModal()}
                         className="flex h-6 w-6 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
                       >
                         <X className="h-4 w-4" />
@@ -970,7 +972,7 @@ export function Dashboard() {
                     <div className="shrink-0 flex justify-end gap-2 border-t border-border bg-card px-6 py-4">
                         <button
                           type="button"
-                          onClick={closeModal}
+                          onClick={() => closeModal()}
                           className="rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
                         >
                           Cancelar

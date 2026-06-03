@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import type { Database } from "@/types/database";
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
@@ -9,12 +10,12 @@ if (!supabaseUrl || !supabaseAnonKey) {
   );
 }
 
-let _supabase: ReturnType<typeof createClient> | undefined;
+let _supabase: ReturnType<typeof createClient<Database>> | undefined;
 
-export const supabase = new Proxy({} as ReturnType<typeof createClient>, {
+export const supabase = new Proxy({} as ReturnType<typeof createClient<Database>>, {
   get(_, prop, receiver) {
     if (!_supabase) {
-      _supabase = createClient(supabaseUrl, supabaseAnonKey, {
+      _supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
         auth: {
           storage: typeof window !== "undefined" ? localStorage : undefined,
           persistSession: true,

@@ -5,4 +5,7 @@ export type { Motorista } from "./motoristas";
 export type { Veiculo } from "./veiculos";
 export type { Profile } from "./profiles";
 export type { Notification, NotificationInput } from "./notifications";
+export type { Message, MessageInput, MessageStatus } from "./messages";
 export type { MotoristaVeiculo } from "./motoristaVeiculo";
+export type { Lembrete, LembreteInput } from "./lembretes";
+export type { Database } from "./database";
