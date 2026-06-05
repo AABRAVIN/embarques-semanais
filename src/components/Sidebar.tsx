@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useLocation, useNavigate, Link } from "react-router-dom";
 import {
   LayoutDashboard,
+  Calculator,
   Truck,
   Users,
   Building2,
@@ -17,9 +18,11 @@ import {
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/hooks/use-auth";
+import { CalculadoraAnttModal } from "@/components/CalculadoraAnttModal";
 
 const NAV_ITEMS = [
   { label: "Dashboard", icon: LayoutDashboard, href: "/", adminOnly: false },
+  { label: "Calculadora ANTT", icon: Calculator, href: "#calculadora-antt", adminOnly: false },
   { label: "Ordem de Chegada", icon: Truck, href: "/ordem-chegada", adminOnly: false },
   { label: "Motoristas e Veículos", icon: Users, href: "/motoristas-veiculos", adminOnly: false },
   { label: "Clientes", icon: Building2, href: "/clientes", adminOnly: false },
@@ -53,6 +56,7 @@ export function Sidebar({ activePath: _activePath }: SidebarProps) {
 
   const isAdmin = profile?.role === "admin";
   const activePath = location.pathname;
+  const [anttModalOpen, setAnttModalOpen] = useState(false);
 
   const visibleItems = NAV_ITEMS.filter((item) => !item.adminOnly || isAdmin);
 
@@ -103,6 +107,27 @@ export function Sidebar({ activePath: _activePath }: SidebarProps) {
           {visibleItems.map((item) => {
             const Icon = item.icon;
             const isActive = activePath === item.href;
+            const isCalculator = item.href === "#calculadora-antt";
+
+            if (isCalculator) {
+              return (
+                <motion.li key={item.href} variants={itemVariants}>
+                  <button
+                    onClick={() => setAnttModalOpen(true)}
+                    className={cn(
+                      "group relative flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200",
+                      "text-sidebar-foreground hover:bg-sidebar-hover hover:text-foreground"
+                    )}
+                  >
+                    <span className="relative z-10 flex items-center gap-3">
+                      <Icon className="h-5 w-5 shrink-0" />
+                      {!collapsed && <span>{item.label}</span>}
+                    </span>
+                  </button>
+                </motion.li>
+              );
+            }
+
             return (
               <motion.li key={item.href} variants={itemVariants}>
                 <Link
@@ -194,6 +219,8 @@ export function Sidebar({ activePath: _activePath }: SidebarProps) {
           <ChevronLeft className="h-4 w-4" />
         )}
       </motion.button>
+
+      <CalculadoraAnttModal open={anttModalOpen} onClose={() => setAnttModalOpen(false)} />
     </motion.aside>
   );
 }
