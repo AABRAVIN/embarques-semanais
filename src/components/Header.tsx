@@ -1,10 +1,14 @@
 import { useState, useEffect } from "react";
-import { User } from "lucide-react";
+import { User, Menu } from "lucide-react";
 import { ThemeToggle } from "./ThemeToggle";
 import { NotificationsPopover } from "./NotificationsPopover";
 import { useAuth } from "@/hooks/use-auth";
 
-export function Header() {
+interface HeaderProps {
+  onToggleSidebar?: () => void;
+}
+
+export function Header({ onToggleSidebar }: HeaderProps) {
   const { profile } = useAuth();
   const [now, setNow] = useState(new Date());
 
@@ -25,7 +29,16 @@ export function Header() {
   });
 
   return (
-    <header className="flex h-[var(--header-height)] items-center justify-between border-b border-border bg-card px-6">
+    <header className="flex h-[var(--header-height)] items-center justify-between border-b border-border bg-card px-4 md:px-6">
+      {/* Mobile hamburger */}
+      <button
+        onClick={onToggleSidebar}
+        className="mr-2 flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-accent hover:text-foreground md:hidden"
+        aria-label="Abrir menu"
+      >
+        <Menu className="h-5 w-5" />
+      </button>
+
       {/* Date / Time */}
       <div className="hidden items-center gap-2 md:flex">
         <span className="text-sm text-muted-foreground capitalize first-letter:uppercase">

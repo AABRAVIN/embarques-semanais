@@ -386,7 +386,7 @@ export function MotoristasVeiculos() {
         ) : records.length === 0 ? (
           <p className="text-xs text-muted-foreground">Nenhum registro encontrado.</p>
         ) : (
-          <div className="overflow-x-auto">
+          <div className="table-responsive-wrapper">
             <table className="w-full text-left text-sm">
               <thead>
                 <tr className="border-b border-border text-xs text-muted-foreground">

@@ -208,3 +208,100 @@
   --shadow-glow: 0 0 40px hsla(217, 91%, 55%, 0.08);
   color-scheme: dark;
 }
+
+/* ===== Responsive Utility Classes ===== */
+
+/* Mobile sidebar overlay backdrop */
+.sidebar-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+.sidebar-backdrop.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Mobile sidebar overlay panel */
+.sidebar-mobile {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  z-index: 50;
+  width: 260px;
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+}
+.sidebar-mobile.open {
+  transform: translateX(0);
+}
+
+/* Responsive table wrapper for horizontal scroll */
+.table-responsive-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+.table-responsive-wrapper::-webkit-scrollbar {
+  height: 4px;
+}
+.table-responsive-wrapper::-webkit-scrollbar-thumb {
+  background: hsl(var(--border));
+  border-radius: 4px;
+}
+
+/* ANTT Calculator - mobile full screen adjustments */
+@media (max-width: 639px) {
+  .antt-modal-content {
+    max-height: 90vh;
+    margin: 0;
+    border-radius: 0;
+    width: 100%;
+    max-width: 100%;
+  }
+  .antt-modal-body {
+    padding: 16px;
+  }
+  .antt-modal-header {
+    padding: 16px 16px 12px;
+  }
+  .antt-toggle-group {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+  .antt-toggle-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .antt-toggle-buttons {
+    width: 100%;
+  }
+  .antt-toggle-buttons button {
+    flex: 1;
+  }
+}
+
+/* Larger touch targets on mobile */
+@media (max-width: 639px) {
+  .mobile-touch-target {
+    min-height: 44px;
+  }
+  .mobile-select,
+  .mobile-input {
+    font-size: 16px !important;
+    min-height: 44px;
+  }
+}
+
+/* Fixed header compensator for mobile anchor scroll */
+.scroll-mobile-top {
+  scroll-margin-top: 64px;
+}

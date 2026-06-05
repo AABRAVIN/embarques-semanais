@@ -46,9 +46,11 @@ const itemVariants = {
 
 interface SidebarProps {
   activePath?: string;
+  mobileOpen?: boolean;
+  onMobileClose?: () => void;
 }
 
-export function Sidebar({ activePath: _activePath }: SidebarProps) {
+export function Sidebar({ activePath: _activePath, mobileOpen, onMobileClose }: SidebarProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const { profile, signOut } = useAuth();
@@ -66,11 +68,111 @@ export function Sidebar({ activePath: _activePath }: SidebarProps) {
   }
 
   return (
+    <>
+      {/* Mobile overlay backdrop */}
+      <div
+        className={cn(
+          "sidebar-backdrop md:hidden",
+          mobileOpen && "open"
+        )}
+        onClick={onMobileClose}
+      />
+
+      {/* Mobile sidebar overlay */}
+      <aside
+        className={cn(
+          "sidebar-mobile flex h-screen flex-col bg-sidebar text-sidebar-foreground md:hidden",
+          mobileOpen && "open"
+        )}
+      >
+        {/* Logo */}
+        <div className="flex h-[var(--header-height)] items-center gap-3 border-b border-border/50 px-4">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-sm font-bold text-primary-foreground shadow-glow">
+            TL
+          </div>
+          <span className="overflow-hidden text-lg font-bold tracking-tight text-foreground">
+            Embarques Semanais
+          </span>
+        </div>
+
+        {/* Navigation */}
+        <nav className="flex-1 overflow-y-auto overflow-x-hidden p-2">
+          <ul className="space-y-0.5">
+            {visibleItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = activePath === item.href;
+              const isCalculator = item.href === "#calculadora-antt";
+
+              if (isCalculator) {
+                return (
+                  <li key={item.href}>
+                    <button
+                      onClick={() => { setAnttModalOpen(true); onMobileClose?.(); }}
+                      className="group relative flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 text-sidebar-foreground hover:bg-sidebar-hover hover:text-foreground"
+                    >
+                      <span className="relative z-10 flex items-center gap-3">
+                        <Icon className="h-5 w-5 shrink-0" />
+                        <span>{item.label}</span>
+                      </span>
+                    </button>
+                  </li>
+                );
+              }
+
+              return (
+                <li key={item.href}>
+                  <Link
+                    to={item.href}
+                    onClick={onMobileClose}
+                    className={cn(
+                      "group relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200",
+                      isActive
+                        ? "bg-sidebar-active/20 text-sidebar-active-foreground shadow-sm"
+                        : "text-sidebar-foreground hover:bg-sidebar-hover hover:text-foreground"
+                    )}
+                  >
+                    <span className="relative z-10 flex items-center gap-3">
+                      <Icon className="h-5 w-5 shrink-0" />
+                      <span>{item.label}</span>
+                    </span>
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </nav>
+
+        {/* User Profile */}
+        <div className="border-t border-border/50 p-3">
+          <div className="flex items-center gap-3 rounded-lg px-2 py-2">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-sidebar-hover">
+              <User className="h-4 w-4 text-sidebar-foreground" />
+            </div>
+            <div className="flex-1 overflow-hidden">
+              <p className="truncate text-sm font-medium text-foreground">
+                {profile?.nome ?? "Usuário"}
+              </p>
+              <p className="truncate text-xs text-sidebar-foreground">
+                {profile?.email ?? ""}
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={() => { signOut(); navigate("/login", { replace: true }); }}
+            className="mt-1 flex w-full items-center gap-3 rounded-lg px-2 py-2 text-sm text-sidebar-foreground transition-colors hover:bg-sidebar-hover hover:text-foreground"
+          >
+            <LogOut className="h-4 w-4 shrink-0" />
+            <span>Sair do sistema</span>
+          </button>
+        </div>
+      </aside>
+
+    {/* Desktop sidebar */}
     <motion.aside
       layout
       transition={{ duration: 0.3, ease: "easeInOut" }}
       className={cn(
-        "flex h-screen flex-col bg-sidebar text-sidebar-foreground transition-[width] duration-300",
+        "hidden md:flex h-screen flex-col bg-sidebar text-sidebar-foreground transition-[width] duration-300",
         collapsed ? "w-16" : "w-[var(--sidebar-width)]"
       )}
     >
@@ -220,7 +322,9 @@ export function Sidebar({ activePath: _activePath }: SidebarProps) {
         )}
       </motion.button>
 
-      <CalculadoraAnttModal open={anttModalOpen} onClose={() => setAnttModalOpen(false)} />
     </motion.aside>
+
+      <CalculadoraAnttModal open={anttModalOpen} onClose={() => setAnttModalOpen(false)} />
+    </>
   );
 }

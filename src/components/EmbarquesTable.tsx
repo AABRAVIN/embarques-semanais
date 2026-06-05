@@ -531,7 +531,7 @@ export function EmbarquesTable({ embarques, onAction, onEdit, selectedDate, date
 
       {/* Premium glass table */}
       <div className="overflow-visible rounded-xl border border-border bg-card transition-shadow duration-200 hover:shadow-glow">
-        <div className="overflow-x-auto">
+        <div className="table-responsive-wrapper">
           <table className="w-full text-left text-sm">
             <thead>
               <tr className="border-b border-border bg-muted">

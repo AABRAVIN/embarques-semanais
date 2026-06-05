@@ -220,11 +220,11 @@ export function CalculadoraAnttModal({ open, onClose }: Props) {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 10 }}
             transition={{ duration: 0.2 }}
-            className="mx-4 flex w-full max-w-2xl flex-col rounded-xl border border-border bg-card shadow-2xl shadow-glow"
+            className="antt-modal-content mx-4 flex w-full max-w-2xl flex-col rounded-xl border border-border bg-card shadow-2xl shadow-glow"
             onClick={(e) => e.stopPropagation()}
           >
             {/* ---- Header ---- */}
-            <div className="flex shrink-0 items-center justify-between gap-3 border-b border-border p-5 pb-3">
+            <div className="antt-modal-header flex shrink-0 items-center justify-between gap-3 border-b border-border p-5 pb-3">
               <div className="flex items-center gap-2">
                 <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
                   <Calculator className="h-4 w-4 text-primary" />
@@ -238,16 +238,16 @@ export function CalculadoraAnttModal({ open, onClose }: Props) {
               </div>
               <button
                 onClick={handleClose}
-                className="flex h-6 w-6 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
               >
                 <X className="h-4 w-4" />
               </button>
             </div>
 
             {/* ---- Body ---- */}
-            <div className="flex-1 space-y-5 overflow-y-auto p-5">
+            <div className="antt-modal-body flex-1 space-y-5 overflow-y-auto p-5">
               {/* Linha 1: Tipo de Carga + Nº Eixos */}
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="mb-1.5 block text-xs font-medium text-muted-foreground">
                     Tipo de Carga
@@ -255,7 +255,7 @@ export function CalculadoraAnttModal({ open, onClose }: Props) {
                   <select
                     value={tipoCarga}
                     onChange={(e) => { setTipoCarga(e.target.value ? (Number(e.target.value) as TipoCarga) : ""); setResultado(null); }}
-                    className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none transition-colors focus:border-primary/50 focus:ring-1 focus:ring-primary/30"
+                    className="mobile-select w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none transition-colors focus:border-primary/50 focus:ring-1 focus:ring-primary/30"
                   >
                     <option value="">Selecione</option>
                     {TIPOS_CARGA.map((t) => (
@@ -272,7 +272,7 @@ export function CalculadoraAnttModal({ open, onClose }: Props) {
                   <select
                     value={numeroEixos}
                     onChange={(e) => { setNumeroEixos(e.target.value ? (Number(e.target.value) as Eixos) : ""); setResultado(null); }}
-                    className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none transition-colors focus:border-primary/50 focus:ring-1 focus:ring-primary/30"
+                    className="mobile-select w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none transition-colors focus:border-primary/50 focus:ring-1 focus:ring-primary/30"
                   >
                     <option value="">Selecione</option>
                     {EIXOS_OPTIONS.map((e) => (
@@ -296,7 +296,7 @@ export function CalculadoraAnttModal({ open, onClose }: Props) {
                   value={distancia}
                   onChange={(e) => { setDistancia(e.target.value); setResultado(null); }}
                   placeholder="Ex.: 100"
-                  className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none transition-colors focus:border-primary/50 focus:ring-1 focus:ring-primary/30"
+                  className="mobile-input w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none transition-colors focus:border-primary/50 focus:ring-1 focus:ring-primary/30"
                 />
               </div>
 
@@ -307,14 +307,14 @@ export function CalculadoraAnttModal({ open, onClose }: Props) {
                 </p>
 
                 {/* Composição Veicular */}
-                <div className="flex items-center justify-between">
+                <div className="antt-toggle-row flex items-center justify-between">
                   <div className="flex-1">
                     <p className="text-xs font-medium text-foreground">É composição veicular?</p>
                     <p className="text-[10px] leading-tight text-muted-foreground">
                       (veículo automotor + implemento ou caminhão simples)
                     </p>
                   </div>
-                  <div className="flex gap-1">
+                  <div className="antt-toggle-buttons flex gap-1">
                     {(["Não", "Sim"] as const).map((opt) => (
                       <button
                         key={opt}
@@ -334,9 +334,9 @@ export function CalculadoraAnttModal({ open, onClose }: Props) {
                 </div>
 
                 {/* Alto Desempenho */}
-                <div className="flex items-center justify-between">
+                <div className="antt-toggle-row flex items-center justify-between">
                   <p className="text-xs font-medium text-foreground">É Alto Desempenho?</p>
-                  <div className="flex gap-1">
+                  <div className="antt-toggle-buttons flex gap-1">
                     {(["Não", "Sim"] as const).map((opt) => (
                       <button
                         key={opt}
@@ -356,9 +356,9 @@ export function CalculadoraAnttModal({ open, onClose }: Props) {
                 </div>
 
                 {/* Retorno Vazio */}
-                <div className="flex items-center justify-between">
+                <div className="antt-toggle-row flex items-center justify-between">
                   <p className="text-xs font-medium text-foreground">Retorno Vazio?</p>
-                  <div className="flex gap-1">
+                  <div className="antt-toggle-buttons flex gap-1">
                     {(["Não", "Sim"] as const).map((opt) => (
                       <button
                         key={opt}
@@ -412,7 +412,7 @@ export function CalculadoraAnttModal({ open, onClose }: Props) {
 
                   <div className="text-center">
                     <span className="text-[10px] text-muted-foreground">VALOR TABELA ANTT OFICIAL</span>
-                    <p className="text-3xl font-bold tracking-tight text-foreground">
+                    <p className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
                       R$ {formatMoney(resultado.total)}
                     </p>
                   </div>

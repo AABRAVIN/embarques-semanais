@@ -179,7 +179,7 @@ export function Historico() {
             <span>Nenhum registro encontrado no histórico.</span>
           </div>
         ) : (
-          <div className="overflow-x-auto">
+          <div className="table-responsive-wrapper">
             <table className="w-full text-left text-sm">
               <thead>
                 <tr className="border-b border-border bg-muted">

@@ -1,3 +1,4 @@
+import { useState, useCallback } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { Sidebar } from "@/components/Sidebar";
 import { Header } from "@/components/Header";
@@ -14,6 +15,15 @@ import { OrdemChegada } from "@/pages/OrdemChegada";
 
 function ProtectedLayout() {
   const { user, loading } = useAuth();
+  const [sidebarMobileOpen, setSidebarMobileOpen] = useState(false);
+
+  const toggleSidebarMobile = useCallback(() => {
+    setSidebarMobileOpen((prev) => !prev);
+  }, []);
+
+  const closeSidebarMobile = useCallback(() => {
+    setSidebarMobileOpen(false);
+  }, []);
 
   if (loading) {
     return (
@@ -29,9 +39,12 @@ function ProtectedLayout() {
 
   return (
     <div className="flex h-screen overflow-hidden bg-background text-foreground">
-      <Sidebar />
+      <Sidebar
+        mobileOpen={sidebarMobileOpen}
+        onMobileClose={closeSidebarMobile}
+      />
       <div className="flex min-w-0 flex-1 flex-col">
-        <Header />
+        <Header onToggleSidebar={toggleSidebarMobile} />
         <main className="flex-1 overflow-y-auto">
           <Routes>
             <Route path="/" element={<Dashboard />} />

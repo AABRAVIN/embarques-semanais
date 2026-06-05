@@ -461,20 +461,20 @@ export function Dashboard() {
         {/* Date Range Picker */}
         <div className="flex flex-wrap items-center gap-2">
           <div className="flex items-center gap-1.5 rounded-lg border border-border bg-card px-3 py-1.5 shadow-sm">
-            <CalendarDays className="h-4 w-4 text-muted-foreground" />
+            <CalendarDays className="h-4 w-4 shrink-0 text-muted-foreground" />
             <input
               type="date"
               value={dateFrom}
               onChange={(e) => setDateFrom(e.target.value)}
-              className="w-32 bg-transparent text-xs text-foreground outline-none [color-scheme:dark]"
+              className="w-28 sm:w-32 bg-transparent text-xs text-foreground outline-none [color-scheme:dark]"
               placeholder="Data inicial"
             />
-            <span className="text-xs text-muted-foreground">—</span>
+            <span className="text-xs text-muted-foreground shrink-0">—</span>
             <input
               type="date"
               value={dateTo}
               onChange={(e) => setDateTo(e.target.value)}
-              className="w-32 bg-transparent text-xs text-foreground outline-none [color-scheme:dark]"
+              className="w-28 sm:w-32 bg-transparent text-xs text-foreground outline-none [color-scheme:dark]"
               placeholder="Data final"
             />
           </div>
@@ -721,7 +721,7 @@ export function Dashboard() {
                                 key={i}
                                 className="rounded-lg border border-border/60 bg-background p-3 flex items-start gap-2"
                               >
-                                <div className="flex-1 grid grid-cols-3 gap-2">
+                                                                <div className="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-2">
                                   <div>
                                     <label className="mb-1 block text-[10px] font-medium text-muted-foreground">
                                       Fornecedor
@@ -822,7 +822,7 @@ export function Dashboard() {
                                 key={i}
                                 className="rounded-lg border border-border/60 bg-background p-3 flex items-start gap-2"
                               >
-                                <div className="flex-1 grid grid-cols-2 gap-2">
+                                                                <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-2">
                                   <div>
                                     <label className="mb-1 block text-[10px] font-medium text-muted-foreground">
                                       Cliente <span className="text-destructive">*</span>
@@ -888,7 +888,7 @@ export function Dashboard() {
                       <h3 className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/60">
                         Dados do Veículo e Status
                       </h3>
-                      <div className="grid grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                           <label className="mb-1 block text-[11px] font-medium text-muted-foreground">
                             Nome do Motorista
