@@ -11,11 +11,15 @@ import {
   X,
   Trash2,
   Lock,
+  Download,
+  Archive,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/use-auth";
 import { signUp, listProfiles } from "@/lib/auth";
 import { supabase } from "@/lib/supabaseClient";
+import { fetchAllEmbarquesForExport, exportToExcel, exportToJSON } from "@/lib/export";
+import { archiveConcludedEmbarques } from "@/lib/embarques";
 import type { Profile } from "@/types/profiles";
 
 export function Configuracoes() {
@@ -32,6 +36,9 @@ export function Configuracoes() {
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [loadingProfiles, setLoadingProfiles] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [exportLoading, setExportLoading] = useState(false);
+  const [showExportDropdown, setShowExportDropdown] = useState(false);
+  const [archiveLoading, setArchiveLoading] = useState(false);
 
   // Password change modal state
   const [passwordTarget, setPasswordTarget] = useState<{ id: string; nome: string } | null>(null);
@@ -149,6 +156,57 @@ export function Configuracoes() {
       setPasswordError(msg);
     } finally {
       setPasswordLoading(false);
+    }
+  }
+
+  async function handleArchive() {
+    console.log("[handleArchive] Botão clicado!");
+    if (!window.confirm("Arquivar todos os embarques concluídos há mais de 30 dias?")) {
+      console.log("[handleArchive] Usuário cancelou.");
+      return;
+    }
+    console.log("[handleArchive] Usuário confirmou. Iniciando...");
+    setArchiveLoading(true);
+    setError("");
+    setSuccess("");
+    try {
+      const count = await archiveConcludedEmbarques(30);
+      if (count === 0) {
+        setSuccess("Nenhum embarque concluído antigo para arquivar.");
+      } else {
+        setSuccess(`${count} embarque(s) arquivado(s) com sucesso!`);
+      }
+    } catch (err: unknown) {
+      console.error("[handleArchive] Erro capturado:", err);
+      const msg = err instanceof Error ? err.message : "Erro ao arquivar.";
+      setError(msg);
+    } finally {
+      setArchiveLoading(false);
+    }
+  }
+
+  async function handleExport(format: "xlsx" | "json") {
+    setShowExportDropdown(false);
+    setExportLoading(true);
+    setError("");
+    setSuccess("");
+    try {
+      const data = await fetchAllEmbarquesForExport();
+      if (data.length === 0) {
+        setError("Nenhum dado encontrado para exportar.");
+        return;
+      }
+      if (format === "xlsx") {
+        exportToExcel(data);
+      } else {
+        exportToJSON(data);
+      }
+      setSuccess(`Backup exportado como ${format.toUpperCase()} com sucesso!`);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Erro ao exportar backup.";
+      setError(msg);
+    } finally {
+      setExportLoading(false);
     }
   }
 
@@ -345,6 +403,87 @@ export function Configuracoes() {
             </table>
           </div>
         )}
+      </div>
+
+      {/* Export backup card */}
+      <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
+        <div className="mb-5 flex items-center gap-3">
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
+            <Download className="h-4 w-4 text-primary" />
+          </div>
+          <div>
+            <h2 className="text-sm font-semibold">Exportar Backup Completo</h2>
+            <p className="text-xs text-muted-foreground">
+              Baixe todos os embarques (ativos + histórico) em Excel ou JSON.
+            </p>
+          </div>
+        </div>
+
+        <div className="relative">
+          <button
+            onClick={() => setShowExportDropdown(!showExportDropdown)}
+            disabled={exportLoading}
+            className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {exportLoading ? (
+              <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+            ) : (
+              <Download className="h-4 w-4" />
+            )}
+            {exportLoading ? "Exportando..." : "Exportar Backup Completo"}
+          </button>
+
+          {showExportDropdown && (
+            <>
+              <div
+                className="fixed inset-0 z-40"
+                onClick={() => setShowExportDropdown(false)}
+              />
+              <div className="absolute left-0 top-full z-50 mt-1 w-44 rounded-xl border border-border bg-card p-1 shadow-lg">
+                <button
+                  onClick={() => handleExport("xlsx")}
+                  className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm transition-colors hover:bg-accent"
+                >
+                  Excel (.xlsx)
+                </button>
+                <button
+                  onClick={() => handleExport("json")}
+                  className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm transition-colors hover:bg-accent"
+                >
+                  JSON (.json)
+                </button>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* Archive card */}
+      <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
+        <div className="mb-5 flex items-center gap-3">
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
+            <Archive className="h-4 w-4 text-primary" />
+          </div>
+          <div>
+            <h2 className="text-sm font-semibold">Arquivar Embarques Concluídos</h2>
+            <p className="text-xs text-muted-foreground">
+              Move embarques com status "concluído" e mais de 30 dias para o histórico.
+            </p>
+          </div>
+        </div>
+
+        <button
+          onClick={handleArchive}
+          disabled={archiveLoading}
+          className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          {archiveLoading ? (
+            <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+          ) : (
+            <Archive className="h-4 w-4" />
+          )}
+          {archiveLoading ? "Arquivando..." : "Arquivar Agora"}
+        </button>
       </div>
 
       {/* Password change modal */}

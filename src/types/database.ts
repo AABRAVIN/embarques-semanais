@@ -94,6 +94,78 @@ export interface Database {
         }
         Relationships: []
       }
+      embarques_historico: {
+        Row: {
+          id: string
+          data: string
+          fornecedor: string
+          fornecedor_cidade: string
+          cliente: string
+          cliente_cidade: string
+          qtd: string
+          material: string
+          placa: string
+          motorista: string | null
+          motorista_id: string | null
+          obs: string | null
+          status: string
+          status_embarque: string | null
+          status_motorista: string | null
+          destaque: string
+          confirmado_at: string | null
+          avisado_at: string | null
+          created_at: string | null
+          updated_at: string | null
+          arquivado_at: string
+        }
+        Insert: {
+          id: string
+          data: string
+          fornecedor: string
+          fornecedor_cidade: string
+          cliente: string
+          cliente_cidade: string
+          qtd: string
+          material: string
+          placa: string
+          motorista?: string | null
+          motorista_id?: string | null
+          obs?: string | null
+          status: string
+          status_embarque?: string | null
+          status_motorista?: string | null
+          destaque: string
+          confirmado_at?: string | null
+          avisado_at?: string | null
+          created_at?: string | null
+          updated_at?: string | null
+          arquivado_at?: string
+        }
+        Update: {
+          id?: string
+          data?: string
+          fornecedor?: string
+          fornecedor_cidade?: string
+          cliente?: string
+          cliente_cidade?: string
+          qtd?: string
+          material?: string
+          placa?: string
+          motorista?: string | null
+          motorista_id?: string | null
+          obs?: string | null
+          status?: string
+          status_embarque?: string | null
+          status_motorista?: string | null
+          destaque?: string
+          confirmado_at?: string | null
+          avisado_at?: string | null
+          created_at?: string | null
+          updated_at?: string | null
+          arquivado_at?: string
+        }
+        Relationships: []
+      }
       motoristas_veiculos: {
         Row: {
           id: string
@@ -420,6 +492,10 @@ export interface Database {
       update_user_password: {
         Args: { user_id: string; new_password: string }
         Returns: void
+      }
+      archive_concluded_embarques: {
+        Args: { dias: number }
+        Returns: number
       }
     }
     Enums: Record<string, never>

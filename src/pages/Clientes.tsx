@@ -2,11 +2,9 @@ import { useState, useEffect, useCallback } from "react";
 import { Plus, Pencil, Trash2, Save, X, AlertCircle, Search, Building2 } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 import { listClientes, searchClientes, createCliente, updateCliente, deleteCliente } from "@/lib/clientes";
-import { useAuth } from "@/hooks/use-auth";
 import type { Cliente } from "@/types/clientes";
 
 export function Clientes() {
-  const { user } = useAuth();
   const [records, setRecords] = useState<Cliente[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -128,19 +126,14 @@ export function Clientes() {
 
     try {
       if (editingId) {
-        const old = records.find((c) => c.id === editingId);
-        await updateCliente(
-          editingId,
-          { nome: nome.trim(), local: local.trim(), frete_acordado: frete.trim(), cond_pagamento: condPagto.trim() },
-          { nome: old?.nome ?? "", local: old?.local ?? null, frete_acordado: old?.frete_acordado ?? null, cond_pagamento: old?.cond_pagamento ?? null },
-          user?.id ?? null
-        );
+        await updateCliente(editingId, {
+          nome: nome.trim(), local: local.trim(), frete_acordado: frete.trim(), cond_pagamento: condPagto.trim()
+        });
         setSuccess("Cliente atualizado com sucesso!");
       } else {
-        await createCliente(
-          { nome: nome.trim(), local: local.trim(), frete_acordado: frete.trim(), cond_pagamento: condPagto.trim() },
-          user?.id ?? null
-        );
+        await createCliente({
+          nome: nome.trim(), local: local.trim(), frete_acordado: frete.trim(), cond_pagamento: condPagto.trim()
+        });
         setSuccess("Cliente cadastrado com sucesso!");
       }
       setShowForm(false);
@@ -156,7 +149,7 @@ export function Clientes() {
   async function handleDelete(cliente: Cliente) {
     if (!window.confirm(`Tem certeza que deseja excluir "${cliente.nome}"?`)) return;
     try {
-      await deleteCliente(cliente.id, user?.id ?? null);
+      await deleteCliente(cliente.id);
       setSuccess("Cliente excluído.");
       loadRecords();
     } catch (err: unknown) {

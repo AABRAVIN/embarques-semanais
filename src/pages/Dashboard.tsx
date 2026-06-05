@@ -5,7 +5,7 @@ import { EmbarquesTable } from "@/components/EmbarquesTable";
 import { RightPanel } from "@/components/RightPanel";
 import { DayNav } from "@/components/DayNav";
 import { StorageBar } from "@/components/StorageBar";
-import { listEmbarques, createEmbarque, updateEmbarque, countByEmbStatus, countByMotStatus, searchEmbarques } from "@/lib/embarques";
+import { listEmbarques, createEmbarque, updateEmbarque, countByEmbStatus, countByMotStatus, searchEmbarques, type EmbarqueComOrigem } from "@/lib/embarques";
 import { supabase } from "@/lib/supabaseClient";
 import { listMotoristasVeiculos } from "@/lib/motoristasVeiculos";
 import type { Embarque } from "@/types/embarque";
@@ -161,8 +161,9 @@ export function Dashboard() {
 
   // Global search
   const [globalSearch, setGlobalSearch] = useState("");
-  const [searchResults, setSearchResults] = useState<Embarque[] | null>(null);
+  const [searchResults, setSearchResults] = useState<EmbarqueComOrigem[] | null>(null);
   const [searching, setSearching] = useState(false);
+  const [navKey, setNavKey] = useState(0);
 
   // Modal state
   const [modalOpen, setModalOpen] = useState(false);
@@ -231,7 +232,11 @@ export function Dashboard() {
         { event: "*", schema: "public", table: "embarques" },
         (payload) => {
           if (payload.eventType === "INSERT") {
-            setEmbarques((prev) => [payload.new as Embarque, ...prev]);
+            setEmbarques((prev) =>
+              prev.some((e) => e.id === (payload.new as Embarque).id)
+                ? prev
+                : [payload.new as Embarque, ...prev]
+            );
           } else if (payload.eventType === "UPDATE") {
             setEmbarques((prev) =>
               prev.map((e) =>
@@ -482,6 +487,18 @@ export function Dashboard() {
               Limpar
             </button>
           )}
+          <button
+            onClick={() => {
+              const hoje = new Date().toISOString().slice(0, 10);
+              setDateFrom(hoje);
+              setDateTo(hoje);
+              setSelectedDate(new Date());
+              setNavKey((k) => k + 1);
+            }}
+            className="flex items-center gap-1 rounded-lg border border-border bg-card px-2 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-accent"
+          >
+            Hoje
+          </button>
         </div>
 
         {/* Period tabs */}
@@ -501,7 +518,7 @@ export function Dashboard() {
           ))}
         </div>
 
-        <DayNav selectedDate={selectedDate} onDateChange={handleDateChange} />
+        <DayNav key={navKey} selectedDate={selectedDate} onDateChange={handleDateChange} />
 
         {/* Action buttons */}
         <div className="flex items-center gap-2">

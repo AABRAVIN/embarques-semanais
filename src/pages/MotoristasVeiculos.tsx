@@ -8,9 +8,11 @@ import {
   X,
   AlertCircle,
   CheckCircle2,
+  Search,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { createMotoristaVeiculo, listMotoristasVeiculos, updateMotoristaVeiculo, deleteMotoristaVeiculo } from "@/lib/motoristasVeiculos";
+import { supabase } from "@/lib/supabaseClient";
+import { createMotoristaVeiculo, listMotoristasVeiculos, updateMotoristaVeiculo, deleteMotoristaVeiculo, searchMotoristasVeiculos } from "@/lib/motoristasVeiculos";
 import type { MotoristaVeiculo } from "@/types/motoristaVeiculo";
 
 const CAPACIDADE_OPTIONS = [
@@ -36,6 +38,7 @@ export function MotoristasVeiculos() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [search, setSearch] = useState("");
 
   const [nome, setNome] = useState("");
   const [placas, setPlacas] = useState([""]);
@@ -45,6 +48,54 @@ export function MotoristasVeiculos() {
   useEffect(() => {
     loadRecords();
   }, []);
+
+  // Realtime
+  useEffect(() => {
+    const channel = supabase
+      .channel("public:motoristas_veiculos")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "motoristas_veiculos" },
+        (payload) => {
+          if (payload.eventType === "INSERT") {
+            setRecords((prev) => [payload.new as MotoristaVeiculo, ...prev]);
+          } else if (payload.eventType === "UPDATE") {
+            setRecords((prev) =>
+              prev.map((r) =>
+                r.id === (payload.new as MotoristaVeiculo).id
+                  ? { ...r, ...(payload.new as MotoristaVeiculo) }
+                  : r
+              )
+            );
+          } else if (payload.eventType === "DELETE") {
+            setRecords((prev) =>
+              prev.filter((r) => r.id !== (payload.old as MotoristaVeiculo).id)
+            );
+          }
+        }
+      )
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, []);
+
+  // Busca com debounce
+  useEffect(() => {
+    const trimmed = search.trim();
+    if (trimmed.length < 2) {
+      loadRecords();
+      return;
+    }
+    const timer = setTimeout(async () => {
+      try {
+        const results = await searchMotoristasVeiculos(trimmed);
+        setRecords(results);
+      } catch {
+        setRecords([]);
+      }
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [search]);
 
   async function loadRecords() {
     setLoading(true);
@@ -304,6 +355,26 @@ export function MotoristasVeiculos() {
             )}
           </div>
         </form>
+      </div>
+
+      {/* Search */}
+      <div className="relative max-w-md">
+        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <input
+          type="text"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Buscar por motorista ou placa..."
+          className="h-9 w-full rounded-lg border border-border bg-background pl-9 pr-8 text-sm transition-all placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:shadow-glow"
+        />
+        {search && (
+          <button
+            onClick={() => setSearch("")}
+            className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        )}
       </div>
 
       {/* Table */}

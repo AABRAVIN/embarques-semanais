@@ -5,8 +5,7 @@ import { Check, X, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ActionDropdown } from "./ActionDropdown";
 import { Pagination } from "./Pagination";
-import { updateEmbarqueEmbStatus, updateEmbarqueMotStatus, clearEmbarqueMotStatus, updateEmbarqueMotorista, updateEmbarqueObs } from "@/lib/embarques";
-import { useAuth } from "@/hooks/use-auth";
+import { updateEmbarqueEmbStatus, updateEmbarqueMotStatus, clearEmbarqueMotStatus, updateEmbarqueMotorista, updateEmbarqueObs, type EmbarqueComOrigem } from "@/lib/embarques";
 import { EditableCell } from "./EditableCell";
 import type { Embarque, EmbStatus, MotStatus } from "@/types/embarque";
 
@@ -158,15 +157,14 @@ function TableRow({ emb, onAction, onEdit }: { emb: Embarque; onAction?: () => v
   const embRef = useRef<HTMLButtonElement>(null);
   const motRef = useRef<HTMLButtonElement>(null);
   const [selectorPos, setSelectorPos] = useState<{ top: number; left: number }>({ top: 0, left: 0 });
-  const { user } = useAuth();
 
   async function handleSaveMotorista(newValue: string) {
-    await updateEmbarqueMotorista(emb.id, newValue, emb.motorista, user?.id ?? null);
+    await updateEmbarqueMotorista(emb.id, newValue);
     onAction?.();
   }
 
   async function handleSaveObs(newValue: string) {
-    await updateEmbarqueObs(emb.id, newValue, emb.obs, user?.id ?? null);
+    await updateEmbarqueObs(emb.id, newValue);
     onAction?.();
   }
 
@@ -248,6 +246,11 @@ function TableRow({ emb, onAction, onEdit }: { emb: Embarque; onAction?: () => v
               <ChevronDown className="h-3 w-3" />
             </span>
             {emb.id.slice(0, 8)}
+            {(emb as EmbarqueComOrigem)._source === "historico" && (
+              <span className="ml-1 rounded-md bg-amber-500/15 px-1.5 py-0.5 text-[9px] font-semibold text-amber-500 border border-amber-500/25">
+                HISTÓRICO
+              </span>
+            )}
           </div>
         </td>
         <td className="whitespace-nowrap px-4 py-3.5 text-sm font-medium">

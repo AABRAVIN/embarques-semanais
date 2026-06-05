@@ -52,6 +52,20 @@ export async function deleteMotoristaVeiculo(id: string) {
   if (error) throw new Error(error.message ?? "Erro ao excluir registro.");
 }
 
+export async function searchMotoristasVeiculos(query: string): Promise<MotoristaVeiculo[]> {
+  const q = `%${query}%`;
+  const { data, error } = await supabase
+    .from("motoristas_veiculos")
+    .select("*")
+    .or(`nome.ilike.${q},placas.ilike.${q}`)
+    .order("created_at", { ascending: false });
+  if (error) throw new Error(error.message ?? "Erro ao pesquisar registros.");
+  return ((data ?? []) as Record<string, unknown>[]).map((item) => ({
+    ...item,
+    placas: parsePlacas(item.placas),
+  })) as MotoristaVeiculo[];
+}
+
 export async function listMotoristasVeiculos(): Promise<MotoristaVeiculo[]> {
   const { data, error } = await supabase
     .from("motoristas_veiculos")

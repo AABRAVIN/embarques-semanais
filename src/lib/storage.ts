@@ -1,6 +1,7 @@
 import { supabase } from "./supabaseClient";
 
 export const STORAGE_LIMIT_MB = 500;
+export const BACKUP_BUCKET = "backup-historico";
 
 export async function getStorageUsageMB(): Promise<number> {
   // Primary: call get_database_size RPC (PostgreSQL pg_database_size)
@@ -36,4 +37,31 @@ export async function getStorageUsageMB(): Promise<number> {
   } catch {
     return 0;
   }
+}
+
+export async function listBackupFiles() {
+  const { data, error } = await supabase.storage
+    .from(BACKUP_BUCKET)
+    .list();
+  if (error) throw error;
+  return data ?? [];
+}
+
+export async function downloadBackupFile(fileName: string): Promise<Blob> {
+  const { data, error } = await supabase.storage
+    .from(BACKUP_BUCKET)
+    .download(fileName);
+  if (error) throw error;
+  return data;
+}
+
+export async function uploadBackupFile(
+  fileName: string,
+  blob: Blob,
+  contentType: string = "application/json"
+) {
+  const { error } = await supabase.storage
+    .from(BACKUP_BUCKET)
+    .upload(fileName, blob, { contentType, upsert: true });
+  if (error) throw error;
 }

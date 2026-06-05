@@ -7,8 +7,8 @@ import {
   Building2,
   BarChart3,
   ScrollText,
+  Clock,
   Settings,
-  Shield,
   ChevronLeft,
   ChevronRight,
   LogOut,
@@ -25,7 +25,7 @@ const NAV_ITEMS = [
   { label: "Clientes", icon: Building2, href: "/clientes", adminOnly: false },
   { label: "Relatórios", icon: BarChart3, href: "/relatorios", adminOnly: false },
   { label: "Logs", icon: ScrollText, href: "/logs", adminOnly: false },
-  { label: "Usuários", icon: Shield, href: "/usuarios", adminOnly: true },
+  { label: "Histórico", icon: Clock, href: "/historico", adminOnly: false },
   { label: "Configurações", icon: Settings, href: "/configuracoes", adminOnly: true },
 ];
 

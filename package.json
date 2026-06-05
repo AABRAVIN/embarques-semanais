@@ -16,11 +16,13 @@
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-router-dom": "^7.15.1",
-    "tailwind-merge": "^3.2.0"
+    "tailwind-merge": "^3.2.0",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@types/react": "^19.1.0",
     "@types/react-dom": "^19.1.0",
+    "@types/xlsx": "^0.0.35",
     "@vitejs/plugin-react": "^4.4.0",
     "autoprefixer": "^10.4.20",
     "postcss": "^8.5.0",
