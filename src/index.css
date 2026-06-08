@@ -305,3 +305,10 @@
 .scroll-mobile-top {
   scroll-margin-top: 64px;
 }
+
+/* Ensures modals never touch screen edges on small screens */
+@media (max-width: 639px) {
+  .modal-safe-mobile {
+    max-width: calc(100vw - 2rem);
+  }
+}

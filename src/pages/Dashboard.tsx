@@ -690,7 +690,7 @@ export function Dashboard() {
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.95, y: 10 }}
                     transition={{ duration: 0.2 }}
-                    className="flex w-full max-w-4xl flex-col max-h-[90vh] rounded-xl border border-border bg-card shadow-2xl shadow-glow"
+                    className="modal-safe-mobile flex w-full max-w-4xl flex-col max-h-[90vh] rounded-xl border border-border bg-card shadow-2xl shadow-glow"
                     onClick={(e) => e.stopPropagation()}
                   >
                     <div className="shrink-0 flex items-center justify-between gap-3 border-b border-border p-6 pb-4">
