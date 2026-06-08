@@ -2,6 +2,7 @@ import { useState, useCallback } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { Sidebar } from "@/components/Sidebar";
 import { Header } from "@/components/Header";
+import { InactivityWatcher } from "@/components/InactivityWatcher";
 import { Dashboard } from "@/pages/Dashboard";
 import { Configuracoes } from "@/pages/Configuracoes";
 import { MotoristasVeiculos } from "@/pages/MotoristasVeiculos";
@@ -39,6 +40,7 @@ function ProtectedLayout() {
 
   return (
     <div className="flex h-screen overflow-hidden bg-background text-foreground">
+      <InactivityWatcher />
       <Sidebar
         mobileOpen={sidebarMobileOpen}
         onMobileClose={closeSidebarMobile}
