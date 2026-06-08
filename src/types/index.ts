@@ -9,4 +9,5 @@ export type { Message, MessageInput, MessageStatus } from "./messages";
 export type { MotoristaVeiculo } from "./motoristaVeiculo";
 export type { Lembrete, LembreteInput } from "./lembretes";
 export type { Cliente } from "./clientes";
+export type { LinksRapidos } from "./linksRapidos";
 export type { Database } from "./database";

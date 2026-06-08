@@ -430,6 +430,27 @@ export interface Database {
         }
         Relationships: []
       }
+      links_rapidos: {
+        Row: {
+          id: string
+          nome: string
+          url: string
+          ordem: number
+        }
+        Insert: {
+          id?: string
+          nome: string
+          url: string
+          ordem: number
+        }
+        Update: {
+          id?: string
+          nome?: string
+          url?: string
+          ordem?: number
+        }
+        Relationships: []
+      }
     }
     logs: {
       Row: {

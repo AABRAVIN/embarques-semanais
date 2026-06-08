@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation, useNavigate, Link } from "react-router-dom";
 import {
   LayoutDashboard,
@@ -10,6 +10,8 @@ import {
   ScrollText,
   Clock,
   Settings,
+  Globe,
+  ExternalLink,
   ChevronLeft,
   ChevronRight,
   LogOut,
@@ -19,6 +21,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/hooks/use-auth";
 import { AvatarUpload } from "@/components/AvatarUpload";
 import { CalculadoraAnttModal } from "@/components/CalculadoraAnttModal";
+import { supabase } from "@/lib/supabaseClient";
+import type { LinksRapidos } from "@/types/linksRapidos";
 
 const NAV_ITEMS = [
   { label: "Dashboard", icon: LayoutDashboard, href: "/", adminOnly: false },
@@ -26,6 +30,7 @@ const NAV_ITEMS = [
   { label: "Ordem de Chegada", icon: Truck, href: "/ordem-chegada", adminOnly: false },
   { label: "Motoristas e Veículos", icon: Users, href: "/motoristas-veiculos", adminOnly: false },
   { label: "Clientes", icon: Building2, href: "/clientes", adminOnly: false },
+  { label: "Links Úteis", icon: Globe, href: "/ferramentas", adminOnly: true },
   { label: "Relatórios", icon: BarChart3, href: "/relatorios", adminOnly: false },
   { label: "Logs", icon: ScrollText, href: "/logs", adminOnly: false },
   { label: "Histórico", icon: Clock, href: "/historico", adminOnly: false },
@@ -59,6 +64,32 @@ export function Sidebar({ activePath: _activePath, mobileOpen, onMobileClose }: 
   const isAdmin = profile?.role === "admin";
   const activePath = location.pathname;
   const [anttModalOpen, setAnttModalOpen] = useState(false);
+  const [ferramentasLinks, setFerramentasLinks] = useState<LinksRapidos[]>([]);
+
+  useEffect(() => {
+    supabase
+      .from("links_rapidos")
+      .select("*")
+      .order("ordem", { ascending: true })
+      .then(({ data }) => {
+        if (data) setFerramentasLinks(data as LinksRapidos[]);
+      });
+
+    const channel = supabase
+      .channel("sidebar:links_rapidos")
+      .on("postgres_changes", { event: "*", schema: "public", table: "links_rapidos" }, () => {
+        supabase
+          .from("links_rapidos")
+          .select("*")
+          .order("ordem", { ascending: true })
+          .then(({ data }) => {
+            if (data) setFerramentasLinks(data as LinksRapidos[]);
+          });
+      })
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, []);
 
   const visibleItems = NAV_ITEMS.filter((item) => !item.adminOnly || isAdmin);
 
@@ -141,6 +172,29 @@ export function Sidebar({ activePath: _activePath, mobileOpen, onMobileClose }: 
                 </li>
               );
             })}
+            {ferramentasLinks.length > 0 && (
+              <li>
+                <div className="px-3 py-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                  Ferramentas
+                </div>
+                {ferramentasLinks.map((link) => (
+                  <li key={link.id}>
+                    <a
+                      href={link.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={onMobileClose}
+                      className="group relative flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 text-sidebar-foreground hover:bg-sidebar-hover hover:text-foreground"
+                    >
+                      <span className="relative z-10 flex items-center gap-3">
+                        <ExternalLink className="h-5 w-5 shrink-0" />
+                        <span>{link.nome}</span>
+                      </span>
+                    </a>
+                  </li>
+                ))}
+              </li>
+            )}
           </ul>
         </nav>
 
@@ -256,6 +310,30 @@ export function Sidebar({ activePath: _activePath, mobileOpen, onMobileClose }: 
               </motion.li>
             );
           })}
+          {ferramentasLinks.length > 0 && (
+            <motion.li variants={itemVariants}>
+              {!collapsed && (
+                <div className="px-3 py-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                  Ferramentas
+                </div>
+              )}
+              {ferramentasLinks.map((link) => (
+                <motion.li key={link.id} variants={itemVariants}>
+                  <a
+                    href={link.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group relative flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 text-sidebar-foreground hover:bg-sidebar-hover hover:text-foreground"
+                  >
+                    <span className="relative z-10 flex items-center gap-3">
+                      <ExternalLink className="h-5 w-5 shrink-0" />
+                      {!collapsed && <span>{link.nome}</span>}
+                    </span>
+                  </a>
+                </motion.li>
+              ))}
+            </motion.li>
+          )}
         </motion.ul>
       </nav>
 

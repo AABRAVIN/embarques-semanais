@@ -7,6 +7,7 @@ import { Dashboard } from "@/pages/Dashboard";
 import { Configuracoes } from "@/pages/Configuracoes";
 import { MotoristasVeiculos } from "@/pages/MotoristasVeiculos";
 import { Clientes } from "@/pages/Clientes";
+import { Ferramentas } from "@/pages/Ferramentas";
 import { Logs } from "@/pages/Logs";
 import { Relatorios } from "@/pages/Relatorios";
 import { Historico } from "@/pages/Historico";
@@ -54,6 +55,7 @@ function ProtectedLayout() {
             <Route path="/motoristas-veiculos" element={<MotoristasVeiculos />} />
             <Route path="/ordem-chegada" element={<OrdemChegada />} />
             <Route path="/clientes" element={<Clientes />} />
+            <Route path="/ferramentas" element={<Ferramentas />} />
             <Route path="/logs" element={<Logs />} />
             <Route path="/relatorios" element={<Relatorios />} />
             <Route path="/historico" element={<Historico />} />
