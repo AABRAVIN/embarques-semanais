@@ -13,11 +13,11 @@ import {
   ChevronLeft,
   ChevronRight,
   LogOut,
-  User,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/hooks/use-auth";
+import { AvatarUpload } from "@/components/AvatarUpload";
 import { CalculadoraAnttModal } from "@/components/CalculadoraAnttModal";
 
 const NAV_ITEMS = [
@@ -87,9 +87,11 @@ export function Sidebar({ activePath: _activePath, mobileOpen, onMobileClose }: 
       >
         {/* Logo */}
         <div className="flex h-[var(--header-height)] items-center gap-3 border-b border-border/50 px-4">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-sm font-bold text-primary-foreground shadow-glow">
-            TL
-          </div>
+          <img
+            src="/images/logo.png"
+            alt="Logo"
+            className="h-14 w-auto object-contain mr-3"
+          />
           <span className="overflow-hidden text-lg font-bold tracking-tight text-foreground">
             Embarques Semanais
           </span>
@@ -145,19 +147,17 @@ export function Sidebar({ activePath: _activePath, mobileOpen, onMobileClose }: 
         {/* User Profile */}
         <div className="border-t border-border/50 p-3">
           <div className="flex items-center gap-3 rounded-lg px-2 py-2">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-sidebar-hover">
-              <User className="h-4 w-4 text-sidebar-foreground" />
-            </div>
-            <div className="flex-1 overflow-hidden">
-              <p className="truncate text-sm font-medium text-foreground">
-                {profile?.nome ?? "Usuário"}
-              </p>
-              <p className="truncate text-xs text-sidebar-foreground">
-                {profile?.email ?? ""}
-              </p>
-            </div>
+          <AvatarUpload size="md" />
+          <div className="flex-1 overflow-hidden">
+            <p className="truncate text-sm font-medium text-foreground">
+              {profile?.nome ?? "Usuário"}
+            </p>
+            <p className="truncate text-xs text-sidebar-foreground">
+              {profile?.email ?? ""}
+            </p>
           </div>
-          <button
+        </div>
+        <button
             onClick={() => { signOut(); navigate("/login", { replace: true }); }}
             className="mt-1 flex w-full items-center gap-3 rounded-lg px-2 py-2 text-sm text-sidebar-foreground transition-colors hover:bg-sidebar-hover hover:text-foreground"
           >
@@ -178,12 +178,12 @@ export function Sidebar({ activePath: _activePath, mobileOpen, onMobileClose }: 
     >
       {/* Logo */}
       <div className="flex h-[var(--header-height)] items-center gap-3 border-b border-border/50 px-4">
-        <motion.div
+        <motion.img
           whileHover={{ scale: 1.05 }}
-          className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-sm font-bold text-primary-foreground shadow-glow"
-        >
-          TL
-        </motion.div>
+          src="/images/logo.png"
+          alt="Logo"
+          className="h-14 w-auto object-contain mr-3"
+        />
         <AnimatePresence>
           {!collapsed && (
             <motion.span
@@ -262,12 +262,7 @@ export function Sidebar({ activePath: _activePath, mobileOpen, onMobileClose }: 
       {/* User Profile */}
       <div className="border-t border-border/50 p-3">
         <div className="flex items-center gap-3 rounded-lg px-2 py-2">
-          <motion.div
-            whileHover={{ scale: 1.1 }}
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-sidebar-hover"
-          >
-            <User className="h-4 w-4 text-sidebar-foreground" />
-          </motion.div>
+          <AvatarUpload size="md" />
           <AnimatePresence>
             {!collapsed && (
               <motion.div

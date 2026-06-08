@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
-import { User, Menu } from "lucide-react";
+import { Menu } from "lucide-react";
 import { ThemeToggle } from "./ThemeToggle";
 import { NotificationsPopover } from "./NotificationsPopover";
+import { AvatarUpload } from "./AvatarUpload";
 import { useAuth } from "@/hooks/use-auth";
 
 interface HeaderProps {
@@ -59,9 +60,7 @@ export function Header({ onToggleSidebar }: HeaderProps) {
 
         {/* User Profile */}
         <div className="flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-1.5 transition-colors hover:bg-accent">
-          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/10">
-            <User className="h-3.5 w-3.5 text-primary" />
-          </div>
+          <AvatarUpload size="sm" />
           <div className="hidden text-right md:block">
             <p className="text-xs font-medium leading-tight">
               {profile?.nome ?? "Usuário"}
