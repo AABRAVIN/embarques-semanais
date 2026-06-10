@@ -8,16 +8,21 @@ export function InactivityWatcher() {
   const navigate = useNavigate();
   const { signOut } = useAuth();
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const signOutRef = useRef(signOut);
+
+  useEffect(() => {
+    signOutRef.current = signOut;
+  }, [signOut]);
 
   const resetTimer = useCallback(() => {
     if (timerRef.current) {
       clearTimeout(timerRef.current);
     }
     timerRef.current = setTimeout(async () => {
-      await signOut();
+      await signOutRef.current();
       navigate("/login", { replace: true });
     }, INACTIVITY_TIMEOUT);
-  }, [navigate, signOut]);
+  }, [navigate]);
 
   useEffect(() => {
     const events: (keyof WindowEventMap)[] = [
