@@ -17,7 +17,7 @@ import type { MotoristaVeiculo } from "@/types/motoristaVeiculo";
 
 const CAPACIDADE_OPTIONS = [
   "12 TON", "15 TON", "20 TON", "25 TON", "27 TON",
-  "30 TON", "32 TON", "35 TON", "40 TON", "45 TON", "50 TON",
+  "30 TON", "32 TON", "35 TON", "37 TON", "40 TON", "45 TON", "50 TON",
 ];
 
 const PLACA_REGEX = /^[A-Za-z]{3}-\d[A-Za-z0-9]\d{2}$/;
