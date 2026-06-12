@@ -256,6 +256,19 @@
   border-radius: 4px;
 }
 
+.table-scroll-vertical {
+  max-height: 65vh;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+.table-scroll-vertical::-webkit-scrollbar {
+  width: 4px;
+}
+.table-scroll-vertical::-webkit-scrollbar-thumb {
+  background: hsl(var(--border));
+  border-radius: 4px;
+}
+
 /* ANTT Calculator - mobile full screen adjustments */
 @media (max-width: 639px) {
   .antt-modal-content {

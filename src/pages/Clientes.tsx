@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Plus, Pencil, Trash2, Save, X, AlertCircle, Search, Building2 } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 import { listClientes, searchClientes, createCliente, updateCliente, deleteCliente } from "@/lib/clientes";
@@ -8,6 +8,7 @@ export function Clientes() {
   const [records, setRecords] = useState<Cliente[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const savingRef = useRef(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [search, setSearch] = useState("");
@@ -32,6 +33,7 @@ export function Clientes() {
         { event: "*", schema: "public", table: "clientes" },
         (payload) => {
           if (payload.eventType === "INSERT") {
+            if (savingRef.current) return;
             setRecords((prev) => [payload.new as Cliente, ...prev]);
           } else if (payload.eventType === "UPDATE") {
             setRecords((prev) =>
@@ -121,6 +123,7 @@ export function Clientes() {
       return;
     }
     setSaving(true);
+    savingRef.current = true;
     setError("");
     setSuccess("");
 
@@ -143,6 +146,7 @@ export function Clientes() {
       setError(err instanceof Error ? err.message : "Erro ao salvar cliente.");
     } finally {
       setSaving(false);
+      savingRef.current = false;
     }
   }
 
@@ -282,7 +286,7 @@ export function Clientes() {
 
       {/* Table */}
       <div className="overflow-hidden rounded-xl border border-border bg-card transition-shadow duration-200 hover:shadow-glow">
-        <div className="table-responsive-wrapper">
+        <div className="table-responsive-wrapper table-scroll-vertical">
           <table className="w-full text-left text-sm">
             <thead>
               <tr className="border-b border-border bg-muted">
